@@ -11,7 +11,7 @@ import java.io.IOException;
 public class GreatWesternTrailApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        SceneUtils.loadMainScene(stage, "view/board.fxml", "The Great Western Trail");
+        SceneUtils.loadMainScene(stage, GreatWesternTrailApplication.class, "view/board.fxml", "The Great Western Trail");
     }
 
     public static void main(String[] args) {

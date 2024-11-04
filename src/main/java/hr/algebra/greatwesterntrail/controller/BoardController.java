@@ -85,11 +85,21 @@ public class BoardController {
     }
 
     public void onBtnWorkersClicked(MouseEvent mouseEvent) {
-        SceneUtils.loadScene("view/workerDeckDetails.fxml", "Worker deck details", player);
+        SceneUtils.loadScene(
+                GreatWesternTrailApplication.class,
+                "view/workerDeckDetails.fxml",
+                "Worker deck details",
+                player
+        );
     }
 
     public void onBtnDeckClicked(MouseEvent mouseEvent) {
-        SceneUtils.loadScene("view/cowDeckDetails.fxml", "Cow deck details", player);
+        SceneUtils.loadScene(
+                GreatWesternTrailApplication.class,
+                "view/cowDeckDetails.fxml",
+                "Cow deck details",
+                player
+        );
     }
 
     public void startNewGame(ActionEvent actionEvent) {
