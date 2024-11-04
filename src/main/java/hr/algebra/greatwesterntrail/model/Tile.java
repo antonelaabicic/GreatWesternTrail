@@ -22,7 +22,7 @@ public class Tile {
         this.objective = objective;
         this.completed = false;
         this.icons = new StackPane();
-        setupBuildingIcons();
+        setupIcons();
     }
 
     public Tile(BuildingType buildingType) {
@@ -33,69 +33,50 @@ public class Tile {
         this.tileType = TileType.HAZARD;
         this.hazardType = hazardType;
         this.icons = new StackPane();
-        setupHazardIcons();
+        setupIcons();
     }
 
     public Tile(TileType tileType) {
         this.tileType = tileType;
         this.icons = new StackPane();
-        setupSpecialTileIcons();
+        setupIcons();
     }
 
-    private void setupBuildingIcons() {
-        ImageView buildingIcon = null;
+    private void setupIcons() {
+        icons.getChildren().clear();
+        ImageView icon = null;
 
-        switch (buildingType) {
-            case CATTLE_EXCHANGE:
-                buildingIcon = ImageUtils.createImageView("../images/barn.png", 90, 90);
-                break;
-            case HIRING_CENTER:
-                buildingIcon = ImageUtils.createImageView("../images/hiring_center.png", 75, 75);
-                break;
-            case TRAIN_STATION:
-                buildingIcon = ImageUtils.createImageView("../images/train_station.png", 90, 90);
-                break;
-        }
-
-        if (buildingIcon != null) {
-            icons.getChildren().add(buildingIcon);
-        }
-    }
-
-    private void setupHazardIcons() {
-        ImageView hazardIcon = null;
-
-        switch (hazardType) {
-            case FLOOD:
-                hazardIcon = ImageUtils.createImageView("../images/flood_icon.png", 100, 100);
-                break;
-            case ROCKSLIDE:
-                hazardIcon = ImageUtils.createImageView("../images/rockslide_icon.png", 100, 100);
-                break;
-            case BANDITS:
-                hazardIcon = ImageUtils.createImageView("../images/bandit_icon.png", 100, 100);
-                break;
-        }
-
-        if (hazardIcon != null) {
-            icons.getChildren().add(hazardIcon);
-        }
-    }
-
-    private void setupSpecialTileIcons() {
         switch (tileType) {
+            case BUILDING:
+                icon = switch (buildingType) {
+                    case CATTLE_EXCHANGE -> ImageUtils.createImageView("../images/barn.png", 90, 90);
+                    case HIRING_CENTER -> ImageUtils.createImageView("../images/hiring_center.png", 75, 75);
+                    case TRAIN_STATION -> ImageUtils.createImageView("../images/train_station.png", 90, 90);
+                };
+                break;
+            case HAZARD:
+                icon = switch (hazardType) {
+                    case FLOOD -> ImageUtils.createImageView("../images/flood_icon.png", 100, 100);
+                    case ROCKSLIDE -> ImageUtils.createImageView("../images/rockslide_icon.png", 100, 100);
+                    case BANDITS -> ImageUtils.createImageView("../images/bandit_icon.png", 100, 100);
+                };
+                break;
             case START:
-                ImageView startIcon = ImageUtils.createImageView("../images/start_icon.png", 90, 90);
-                icons.getChildren().add(startIcon);
+                icon = ImageUtils.createImageView("../images/start_icon.png", 90, 90);
                 break;
             case END:
-                ImageView endIcon = ImageUtils.createImageView("../images/kansas_icon.png", 100, 100);
-                icons.getChildren().add(endIcon);
+                icon = ImageUtils.createImageView("../images/kansas_icon.png", 100, 100);
                 break;
             case EMPTY:
-                ImageView grassIcon = ImageUtils.createImageView("../images/grass_icon.png", 100, 100);
-                icons.getChildren().add(grassIcon);
+                icon = ImageUtils.createImageView("../images/grass_icon.png", 100, 100);
                 break;
         }
+        if (icon != null) {
+            icons.getChildren().add(icon);
+        }
+    }
+
+    public void setIcons() {
+        setupIcons();
     }
 }

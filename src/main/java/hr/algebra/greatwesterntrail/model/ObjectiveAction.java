@@ -19,13 +19,6 @@ public enum ObjectiveAction {
     FIRE_ENGINEER(5, 5, "Fire an Engineer"),
     FIRE_BUILDER(5,5, "Fire a Builder"),
 
-    CROSS_FLOOD(5, 5, "Cross a flood"),
-    CROSS_ROCKSLIDE(5, 5, "Cross a rockslide"),
-    CROSS_BANDITS(5, 5, "Cross bandits"),
-    REMOVE_FLOOD(20, 20, "Remove a flood"),
-    REMOVE_ROCKSLIDE(20, 20, "Remove a rockslide"),
-    REMOVE_BANDITS(20, 20, "Remove bandits"),
-
     ADVANCE_TRAIN_PROGRESS(0, 0, "Advance train progress");
 
     @Getter

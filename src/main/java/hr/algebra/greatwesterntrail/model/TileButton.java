@@ -1,5 +1,6 @@
 package hr.algebra.greatwesterntrail.model;
 
+import hr.algebra.greatwesterntrail.controller.BoardController;
 import hr.algebra.greatwesterntrail.utils.DialogUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -11,6 +12,11 @@ public class TileButton extends Button {
     @Getter
     private final Tile tile;
     private final Player player;
+
+    private static final int CROSS_HAZARD_COST = 5;
+    private static final int REMOVE_HAZARD_COST = 20;
+    private static final int CROSS_HAZARD_VP = 5;
+    private static final int REMOVE_HAZARD_VP = 20;
 
     public TileButton(Tile tile, Player player) {
         this.tile = tile;
@@ -39,7 +45,6 @@ public class TileButton extends Button {
                 }
             }
         }
-
     }
 
     private void showEmptyTileDialog() {
@@ -48,28 +53,39 @@ public class TileButton extends Button {
     private void handleHazardDialog(String hazardName) {
         boolean removeHazard = DialogUtils.showConfirmDialog(
                 "Hazard Encountered!",
-                "Do you want to cross the " + hazardName
-                        + " hazard or remove it? \nCrossing costs 5$ and removing costs 20$.");
+                "Do you want to cross the " + hazardName + " hazard or remove it? " +
+                        "\nCrossing costs " + CROSS_HAZARD_COST +"$ and removing " + REMOVE_HAZARD_COST +"$.");
 
-        if (removeHazard) {
-            player.setMoney(player.getMoney() - 20);
-            player.setVp(player.getVp() + 20);
-            tile.setTileType(TileType.EMPTY);
-            tile.setHazardType(null);
-            setGraphic(tile.getIcons());
-            DialogUtils.showDialog(
-                    "Hazard Removed",
-                    "You've gained 20 VPs. The hazard has been removed.",
-                    Alert.AlertType.INFORMATION);
+        int cost = removeHazard ? REMOVE_HAZARD_COST : CROSS_HAZARD_COST;
+        int vpReward = removeHazard ? REMOVE_HAZARD_VP : CROSS_HAZARD_VP;
+
+        if (player.getMoney() >= cost) {
+            player.setMoney(player.getMoney() - cost);
+            player.setVp(player.getVp() + vpReward);
+
+            if (removeHazard) {
+                tile.setTileType(TileType.EMPTY);
+                tile.setHazardType(null);
+                tile.setIcons();
+                setGraphic(tile.getIcons());
+                DialogUtils.showDialog(
+                        "Hazard Removed",
+                        "You've gained " + REMOVE_HAZARD_VP + " VPs. The hazard has been removed.",
+                        Alert.AlertType.INFORMATION);
+            } else {
+                DialogUtils.showDialog(
+                        "Hazard Crossed",
+                        "You've paid " + CROSS_HAZARD_COST + "$.",
+                        Alert.AlertType.INFORMATION);
+            }
         } else {
-            player.setMoney(player.getMoney() - 5);
-            player.setVp(player.getVp() + 5);
             DialogUtils.showDialog(
-                    "Hazard Crossed",
-                    "You've paid 5 VPs.",
-                    Alert.AlertType.INFORMATION);
+                    "Insufficient Funds",
+                    "You do not have enough money to " + (removeHazard ? "remove" : "cross") + " the hazard.",
+                    Alert.AlertType.ERROR);
         }
     }
+
 
     private void showTrainStationDialog() {
     }

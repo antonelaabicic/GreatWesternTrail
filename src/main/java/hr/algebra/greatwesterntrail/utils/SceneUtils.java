@@ -22,6 +22,7 @@ public final class SceneUtils {
             stage.show();
         } catch (Exception e) {
             System.out.println("Error loading main scene: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

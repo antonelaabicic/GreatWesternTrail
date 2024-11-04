@@ -28,22 +28,4 @@ public class Player {
         }
         return deck;
     }
-
-//    private Map<CowType, Integer> initializeCowDeck() {
-//        Map<CowType, Integer> deck = new EnumMap<>(CowType.class);
-//        Random random = new Random();
-//        for (CowType type : CowType.values()) {
-//            deck.put(type, random.nextInt(3));
-//        }
-//        return deck;
-//    }
-//
-//    private Map<WorkerType, Integer> initializeWorkerDeck() {
-//        Map<WorkerType, Integer> deck = new EnumMap<>(WorkerType.class);
-//        Random random = new Random();
-//        for (WorkerType type : WorkerType.values()) {
-//            deck.put(type, random.nextInt(3));
-//        }
-//        return deck;
-//    }
 }

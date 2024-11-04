@@ -45,10 +45,11 @@ public class BoardController {
         tileRepository = TileRepository.INSTANCE;
         initializeBoard();
         setupButtons();
-        //printTileButtons(); // provjera
     }
 
     private void initializeBoard() {
+        boardGrid.getChildren().clear();
+
         Tile[][] tiles = tileRepository.getTiles();
 
         for (int row = 0; row < TileRepository.GRID_SIZE; row++) {
@@ -101,27 +102,5 @@ public class BoardController {
     }
 
     public void generateDocumentation(ActionEvent actionEvent) {
-    }
-
-    public void printTileButtons() {
-        for (int row = 0; row < TileRepository.GRID_SIZE; row++) {
-            for (int col = 0; col < TileRepository.GRID_SIZE; col++) {
-                TileButton tileButton = tileButtons[row][col];
-                if (tileButton != null) {
-                    Tile tile = tileButton.getTile();
-                    System.out.printf("TileButton at [%d, %d]: TileType=%s, BuildingType=%s, HazardType=%s, Objective=%s, Completed=%b%n",
-                            row,
-                            col,
-                            tile.getTileType(),
-                            tile.getBuildingType(),
-                            tile.getHazardType(),
-                            tile.getObjective(),
-                            tile.isCompleted()
-                    );
-                } else {
-                    System.out.printf("TileButton at [%d, %d]: null%n", row, col);
-                }
-            }
-        }
     }
 }
