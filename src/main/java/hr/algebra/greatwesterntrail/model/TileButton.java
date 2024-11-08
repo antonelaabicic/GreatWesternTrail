@@ -95,6 +95,10 @@ public class TileButton extends Button {
     }
 
     private void showHiringCenterDialog() {
+        SceneUtils.loadScene(GreatWesternTrailApplication.class,
+                "view/hiringCenterPopup.fxml",
+                "Hiring Center",
+                player);
     }
 
     private void showCattleExchangeDialog() {
