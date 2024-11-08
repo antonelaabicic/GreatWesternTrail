@@ -10,8 +10,13 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-<GridPane gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="800.0" stylesheets="@../styles/deck_details.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hr.algebra.greatwesterntrail.controller.CowDeckController">
-    <Rectangle fill="#90EE90" height="340.0" width="800" GridPane.columnSpan="4" GridPane.rowSpan="2" />
+<GridPane gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="800.0" stylesheets="@../styles/styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hr.algebra.greatwesterntrail.controller.CowDeckController">
+    <Rectangle fill="#90EE90" height="300.0" width="800" GridPane.columnSpan="4" GridPane.rowSpan="3" />
+
+    <Rectangle fill="#e089b9" height="200.0" width="200" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+    <Rectangle fill="#F5B243" height="200.0" width="200" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+    <Rectangle fill="#8ed8c8" height="200.0" width="200" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+    <Rectangle fill="#ff8b94" height="200.0" width="200" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
     <StackPane GridPane.columnIndex="0" GridPane.rowIndex="0">
         <HBox alignment="CENTER_LEFT" spacing="5">
@@ -125,6 +130,6 @@
     <rowConstraints>
         <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
         <RowConstraints minHeight="200.0" prefHeight="200.0" vgrow="NEVER" />
-      <RowConstraints />
+        <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER"/>
     </rowConstraints>
 </GridPane>

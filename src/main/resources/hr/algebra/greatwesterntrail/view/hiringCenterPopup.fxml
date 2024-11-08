@@ -10,12 +10,8 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-<GridPane gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" stylesheets="@../styles/styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hr.algebra.greatwesterntrail.controller.WorkerDeckController">
+<GridPane gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" stylesheets="@../styles/styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hr.algebra.greatwesterntrail.controller.HiringCenterPopupController">
     <Rectangle fill="#9fb8ce" height="300" width="600" GridPane.columnSpan="3" GridPane.rowSpan="3" />
-
-    <Rectangle fill="#ffdd57" height="200.0" width="200" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-    <Rectangle fill="#28a071" height="200.0" width="200" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-    <Rectangle fill="#ee4266" height="200.0" width="200" GridPane.columnIndex="2" GridPane.rowIndex="1" />
 
     <StackPane GridPane.columnIndex="0" GridPane.rowIndex="0">
         <HBox alignment="CENTER_LEFT" spacing="5">

@@ -1,7 +1,9 @@
 package hr.algebra.greatwesterntrail.model;
 
+import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
 import hr.algebra.greatwesterntrail.controller.BoardController;
 import hr.algebra.greatwesterntrail.utils.DialogUtils;
+import hr.algebra.greatwesterntrail.utils.SceneUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import lombok.Getter;
@@ -48,6 +50,7 @@ public class TileButton extends Button {
     }
 
     private void showEmptyTileDialog() {
+
     }
 
     private void handleHazardDialog(String hazardName) {
@@ -88,11 +91,16 @@ public class TileButton extends Button {
 
 
     private void showTrainStationDialog() {
+
     }
 
     private void showHiringCenterDialog() {
     }
 
     private void showCattleExchangeDialog() {
+        SceneUtils.loadScene(GreatWesternTrailApplication.class,
+                "view/cowExchangePopup.fxml",
+                "Cow Exchange",
+                player);
     }
 }

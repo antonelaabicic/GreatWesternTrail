@@ -1,0 +1,48 @@
+.label {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10px;
+}
+
+.right-padding {
+    -fx-padding: 0 10 0 0;
+}
+
+#btn-confirm {
+    -fx-background-color: #008080;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16;
+    -fx-background-radius: 15;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.3) , 5,0,0,1 );
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-transition: -fx-background-color 0.3s ease, -fx-scale-x 0.3s ease, -fx-scale-y 0.3s ease;
+}
+
+#btn-confirm:hover {
+    -fx-background-color: #004080;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.border-bottom {
+    -fx-border-color: black;
+    -fx-border-width: 0 0 1 0;
+}
+
+.border-right {
+    -fx-border-color: black;
+    -fx-border-width: 0 1 0 0;
+}
+
+.border-bottom-right {
+    -fx-border-color: black;
+    -fx-border-width: 0 1 1 0;
+}
+
+
+

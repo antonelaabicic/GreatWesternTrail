@@ -51,9 +51,9 @@ public final class SceneUtils {
                 Method initializeMethod = controller.getClass().getMethod("initialize", Player.class);
                 initializeMethod.invoke(controller, player);
             } catch (NoSuchMethodException e) {
-                System.out.println("No initialize(Player) method found for controller: " + controller.getClass().getName());
+                System.err.println("No initialize method found for controller: " + controller.getClass().getName());
             } catch (Exception e) {
-                System.out.println("Error invoking initialize method on controller: " + e.getMessage());
+                System.err.println("Error invoking initialize method on controller: " + e.getMessage());
                 e.printStackTrace();
             }
         }

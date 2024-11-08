@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Rectangle?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" stylesheets="@../styles/styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hr.algebra.greatwesterntrail.controller.CowExchangePopupController">
+    <Rectangle fill="#90EE90" height="400.0" width="800" GridPane.columnSpan="4" GridPane.rowSpan="5" />
+
+    <Rectangle fill="#e089b9" height="200.0" width="200" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+    <Rectangle fill="#F5B243" height="200.0" width="200" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+    <Rectangle fill="#8ed8c8" height="200.0" width="200" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+    <Rectangle fill="#ff8b94" height="200.0" width="200" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+    <StackPane GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="border-bottom-right">
+        <HBox alignment="CENTER" spacing="5">
+            <Label text="Holstein" />
+        </HBox>
+    </StackPane>
+    <StackPane GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="border-bottom-right">
+        <HBox alignment="CENTER" spacing="5">
+            <Label text="Jersey" />
+        </HBox>
+    </StackPane>
+    <StackPane GridPane.columnIndex="2" GridPane.rowIndex="0" styleClass="border-bottom-right">
+        <HBox alignment="CENTER" spacing="5">
+            <Label text="Black Angus" />
+        </HBox>
+    </StackPane>
+    <StackPane GridPane.columnIndex="3" GridPane.rowIndex="0" styleClass="border-bottom">
+        <HBox alignment="CENTER" spacing="5">
+            <Label text="Texas Longhorn" />
+        </HBox>
+    </StackPane>
+
+    <StackPane GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="border-bottom-right">
+        <children>
+            <ImageView fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+                <image>
+                    <Image url="@../images/holstein_cow.png" />
+                </image>
+            </ImageView>
+            <ImageView fitHeight="35.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
+                <image>
+                    <Image url="@../images/1dollar.png" />
+                </image>
+            </ImageView>
+        </children>
+    </StackPane>
+    <StackPane GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="border-bottom-right">
+        <children>
+            <ImageView fitHeight="180.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+                <image>
+                    <Image url="@../images/jersey_cow.png" />
+                </image>
+            </ImageView>
+            <ImageView fitHeight="35.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
+                <image>
+                    <Image url="@../images/5dollars.png" />
+                </image>
+            </ImageView>
+        </children>
+    </StackPane>
+    <StackPane GridPane.columnIndex="2" GridPane.rowIndex="1" styleClass="border-bottom-right">
+        <children>
+            <ImageView fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+                <image>
+                    <Image url="@../images/blackangus_cow.png" />
+                </image>
+            </ImageView>
+            <ImageView fitHeight="35.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
+                <image>
+                    <Image url="@../images/10dollars.png" />
+                </image>
+            </ImageView>
+        </children>
+    </StackPane>
+    <StackPane GridPane.columnIndex="3" GridPane.rowIndex="1" styleClass="border-bottom">
+        <children>
+            <ImageView fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+                <image>
+                    <Image url="@../images/texaslonghorn_cow.png" />
+                </image>
+            </ImageView>
+            <ImageView fitHeight="35.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
+                <image>
+                    <Image url="@../images/20dollars.png" />
+                </image>
+            </ImageView>
+        </children>
+    </StackPane>
+
+    <StackPane GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="border-right">
+        <HBox alignment="CENTER_RIGHT" spacing="2" styleClass="right-padding">
+            <Label text="Buy: " />
+            <TextField fx:id="tfBuyHolsteinQuantity" prefWidth="50" promptText="0" text="0" />
+        </HBox>
+    </StackPane>
+    <StackPane GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="border-right">
+        <HBox alignment="CENTER_RIGHT" spacing="2" styleClass="right-padding">
+            <Label text="Buy: " />
+            <TextField fx:id="tfBuyJerseyQuantity" prefWidth="50" promptText="0" text="0" />
+        </HBox>
+    </StackPane>
+    <StackPane GridPane.columnIndex="2" GridPane.rowIndex="2" styleClass="border-right">
+        <HBox alignment="CENTER_RIGHT" spacing="2" styleClass="right-padding">
+            <Label text="Buy: " />
+            <TextField fx:id="tfBuyAngusQuantity" prefWidth="50" promptText="0" text="0" />
+        </HBox>
+    </StackPane>
+    <StackPane GridPane.columnIndex="3" GridPane.rowIndex="2" >
+        <HBox alignment="CENTER_RIGHT" spacing="2" styleClass="right-padding">
+            <Label text="Buy: " />
+            <TextField fx:id="tfBuyLonghornQuantity" prefWidth="50" promptText="0" text="0" />
+        </HBox>
+    </StackPane>
+
+    <StackPane GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="border-bottom-right">
+        <HBox alignment="CENTER_RIGHT" spacing="2" styleClass="right-padding">
+            <Label text="Sell: " />
+            <TextField fx:id="tfSellHolsteinQuantity" prefWidth="50" promptText="0" text="0" />
+        </HBox>
+    </StackPane>
+    <StackPane GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="border-bottom-right">
+        <HBox alignment="CENTER_RIGHT" spacing="2" styleClass="right-padding">
+            <Label text="Sell: " />
+            <TextField fx:id="tfSellJerseyQuantity" prefWidth="50" promptText="0" text="0" />
+        </HBox>
+    </StackPane>
+    <StackPane GridPane.columnIndex="2" GridPane.rowIndex="3" styleClass="border-bottom-right">
+        <HBox alignment="CENTER_RIGHT" spacing="2" styleClass="right-padding">
+            <Label text="Sell: " />
+            <TextField fx:id="tfSellAngusQuantity" prefWidth="50" promptText="0" text="0" />
+        </HBox>
+    </StackPane>
+    <StackPane GridPane.columnIndex="3" GridPane.rowIndex="3" styleClass="border-bottom">
+        <HBox alignment="CENTER_RIGHT" spacing="2" styleClass="right-padding">
+            <Label text="Sell: " />
+            <TextField fx:id="tfSellLonghornQuantity" prefWidth="50" promptText="0" text="0" />
+        </HBox>
+    </StackPane>
+
+    <StackPane GridPane.columnIndex="2" GridPane.rowIndex="4">
+        <HBox alignment="CENTER_LEFT" spacing="2" styleClass="right-padding">
+            <Label text="Total: " />
+            <Label fx:id="totalCost" />
+        </HBox>
+    </StackPane>
+
+    <StackPane GridPane.columnIndex="3" GridPane.rowIndex="4" alignment="CENTER_RIGHT" styleClass="right-padding">
+        <Button fx:id="btnConfirm" id="btn-confirm" text="Confirm purchase"/>
+    </StackPane>
+
+
+    <columnConstraints>
+        <ColumnConstraints hgrow="NEVER" prefWidth="200.0" />
+        <ColumnConstraints hgrow="NEVER" prefWidth="200.0" />
+        <ColumnConstraints hgrow="NEVER" prefWidth="200.0" />
+        <ColumnConstraints hgrow="NEVER" prefWidth="200.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+        <RowConstraints minHeight="200.0" prefHeight="200.0" vgrow="NEVER" />
+        <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+        <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+        <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+    </rowConstraints>
+</GridPane>
