@@ -85,7 +85,9 @@ public class CowExchangePopupController {
         int earnedVP = calculateVPs(buyQuantities, sellQuantities);
         player.setVp(player.getVp() + earnedVP);
 
-        DialogUtils.showDialog("Transaction complete", "You earned " + earnedVP + " Victory Points from this transaction!", Alert.AlertType.INFORMATION);
+        DialogUtils.showDialog("Transaction complete",
+                "You earned " + earnedVP + " VPs from this transaction! Your budget is currently " + player.getMoney() + "$.",
+                Alert.AlertType.INFORMATION);
         ((Stage) btnConfirm.getScene().getWindow()).close();
     }
 
@@ -143,13 +145,13 @@ public class CowExchangePopupController {
     }
 
     private TextField getSellTextField(CowType cowType) {
-        switch (cowType) {
-            case HOLSTEIN: return tfSellHolsteinQuantity;
-            case JERSEY: return tfSellJerseyQuantity;
-            case BLACK_ANGUS: return tfSellAngusQuantity;
-            case TEXAS_LONGHORN: return tfSellLonghornQuantity;
-            default: throw new IllegalArgumentException("Unknown CowType: " + cowType);
-        }
+        return switch (cowType) {
+            case HOLSTEIN -> tfSellHolsteinQuantity;
+            case JERSEY -> tfSellJerseyQuantity;
+            case BLACK_ANGUS -> tfSellAngusQuantity;
+            case TEXAS_LONGHORN -> tfSellLonghornQuantity;
+            default -> throw new IllegalArgumentException("Unknown cow type: " + cowType);
+        };
     }
 
     private int calculateVPs(Map<CowType, Integer> buyQuantities, Map<CowType, Integer> sellQuantities) {
