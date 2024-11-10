@@ -47,7 +47,11 @@ public class TileButton extends Button {
     }
 
     private void showEmptyTileDialog() {
-
+        SceneUtils.loadScene(GreatWesternTrailApplication.class,
+                "view/emptyTilePopup.fxml",
+                "Empty Tile",
+                player,
+                this);
     }
 
     private void handleHazardDialog(String hazardName) {

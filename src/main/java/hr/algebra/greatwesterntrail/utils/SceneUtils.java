@@ -1,13 +1,9 @@
 package hr.algebra.greatwesterntrail.utils;
 
-import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
-import hr.algebra.greatwesterntrail.controller.CowDeckController;
-import hr.algebra.greatwesterntrail.controller.WorkerDeckController;
 import hr.algebra.greatwesterntrail.model.Player;
+import hr.algebra.greatwesterntrail.model.TileButton;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.lang.reflect.Method;
@@ -28,7 +24,7 @@ public final class SceneUtils {
         }
     }
 
-    public static void loadScene(Class<?> appClass, String fxmlPath, String title, Player player) {
+    public static void loadScene(Class<?> appClass, String fxmlPath, String title, Player player, TileButton tileButton) {
         try {
             FXMLLoader loader = new FXMLLoader(appClass.getResource(fxmlPath));
             Scene scene = new Scene(loader.load());
@@ -38,7 +34,7 @@ public final class SceneUtils {
             stage.setScene(scene);
 
             Object controller = loader.getController();
-            invokeInitializeIfPresent(controller, player);
+            invokeInitializeIfPresent(controller, player, tileButton);
 
             stage.show();
         } catch (Exception e) {
@@ -47,13 +43,24 @@ public final class SceneUtils {
         }
     }
 
-    private static void invokeInitializeIfPresent(Object controller, Player player) {
+    public static void loadScene(Class<?> appClass, String fxmlPath, String title, Player player) {
+        loadScene(appClass, fxmlPath, title, player, null);
+    }
+
+    private static void invokeInitializeIfPresent(Object controller, Player player, TileButton tileButton) {
         if (controller != null) {
             try {
-                Method initializeMethod = controller.getClass().getMethod("initialize", Player.class);
-                initializeMethod.invoke(controller, player);
+                Method initializeMethod;
+                if (tileButton != null) {
+                    initializeMethod = controller.getClass().getMethod("initialize", Player.class, TileButton.class);
+                    initializeMethod.invoke(controller, player, tileButton);
+                } else {
+                    initializeMethod = controller.getClass().getMethod("initialize", Player.class);
+                    initializeMethod.invoke(controller, player);
+                }
+
             } catch (NoSuchMethodException e) {
-                System.err.println("No initialize method found for controller: " + controller.getClass().getName());
+                System.err.println("No compatible initialize method found for controller: " + controller.getClass().getName());
             } catch (Exception e) {
                 System.err.println("Error invoking initialize method on controller: " + e.getMessage());
                 e.printStackTrace();

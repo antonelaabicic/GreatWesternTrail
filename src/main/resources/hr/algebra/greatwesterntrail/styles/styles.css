@@ -44,5 +44,12 @@
     -fx-border-width: 0 1 1 0;
 }
 
+.empty-tile-highlight {
+    -fx-border-color: #00FF99;
+    -fx-border-width: 5;
+    -fx-background-color: rgba(0, 255, 153, 0.4);
+}
+
+
 
 
