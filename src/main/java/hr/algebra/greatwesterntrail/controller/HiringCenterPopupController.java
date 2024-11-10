@@ -3,15 +3,15 @@ package hr.algebra.greatwesterntrail.controller;
 import hr.algebra.greatwesterntrail.model.Player;
 import hr.algebra.greatwesterntrail.model.WorkerType;
 import hr.algebra.greatwesterntrail.utils.DialogUtils;
+import hr.algebra.greatwesterntrail.utils.PopupUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-import java.util.List;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class HiringCenterPopupController {
@@ -26,39 +26,33 @@ public class HiringCenterPopupController {
     public Button btnConfirm;
 
     private Player player;
+    private Map<WorkerType, TextField> hireTextFieldMap = new EnumMap<>(WorkerType.class);
+    private Map<WorkerType, TextField> fireTextFieldMap = new EnumMap<>(WorkerType.class);
 
     public void initialize(Player player) {
         this.player = player;
+        initializeTextFieldMaps();
 
-        setInputValidation(tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity,
+        PopupUtils.setInputValidation(tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity,
                 tfFireCowboyQuantity, tfFireBuilderQuantity, tfFireEngineerQuantity);
 
         btnConfirm.setOnAction(event -> confirm());
-        updateSellingTextFields();
-
-        addCostCalculationListener(tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity,
+        PopupUtils.addCostCalculationListener(this::updateTotalCost,
+                tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity,
                 tfFireCowboyQuantity, tfFireBuilderQuantity, tfFireEngineerQuantity);
 
+        updateSellingTextFields();
         updateTotalCost();
     }
 
-    private void setInputValidation(TextField... textFields) {
-        for (TextField textField : textFields) {
-            textField.addEventFilter(KeyEvent.KEY_TYPED, event -> {
-                if (!event.getCharacter().matches("\\d")) {
-                    event.consume();
-                }
-            });
-        }
-    }
-
-    private int parseTextFieldValue(TextField textField) {
-        return textField.getText().isEmpty() ? 0 : Integer.parseInt(textField.getText());
+    private void initializeTextFieldMaps() {
+        hireTextFieldMap = PopupUtils.createEnumTextFieldMap(WorkerType.class, tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity);
+        fireTextFieldMap = PopupUtils.createEnumTextFieldMap(WorkerType.class, tfFireCowboyQuantity, tfFireBuilderQuantity, tfFireEngineerQuantity);
     }
 
     private void confirm() {
-        Map<WorkerType, Integer> hireQuantities = getWorkerQuantities(tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity);
-        Map<WorkerType, Integer> fireQuantities = getWorkerQuantities(tfFireCowboyQuantity, tfFireBuilderQuantity, tfFireEngineerQuantity);
+        Map<WorkerType, Integer> hireQuantities = getWorkerQuantities(hireTextFieldMap);
+        Map<WorkerType, Integer> fireQuantities = getWorkerQuantities(fireTextFieldMap);
 
         if (!canHireWorkers(fireQuantities)) {
             DialogUtils.showDialog("Invalid hiring", "You cannot fire more workers than you currently have.", Alert.AlertType.WARNING);
@@ -66,7 +60,7 @@ public class HiringCenterPopupController {
             return;
         }
 
-        int totalCostValue = calculateTotalCost(hireQuantities, fireQuantities);
+        int totalCostValue = PopupUtils.calculateTransactionCost(hireQuantities, fireQuantities);
         if (totalCostValue > player.getMoney()) {
             DialogUtils.showDialog("Insufficient funds", "You don't have enough money to complete the purchase.", Alert.AlertType.WARNING);
             resetTextFields();
@@ -76,7 +70,7 @@ public class HiringCenterPopupController {
         updateWorkerDeck(hireQuantities, fireQuantities);
         player.setMoney(player.getMoney() - totalCostValue);
 
-        int earnedVP = calculateVPs(hireQuantities, fireQuantities);
+        int earnedVP = PopupUtils.calculateVPs(hireQuantities, fireQuantities);;
         player.setVp(player.getVp() + earnedVP);
 
         DialogUtils.showDialog("Transaction complete",
@@ -85,12 +79,8 @@ public class HiringCenterPopupController {
         ((Stage) btnConfirm.getScene().getWindow()).close();
     }
 
-    private Map<WorkerType, Integer> getWorkerQuantities(TextField... fields) {
-        return Map.of(
-                WorkerType.COWBOY, parseTextFieldValue(fields[0]),
-                WorkerType.BUILDER, parseTextFieldValue(fields[1]),
-                WorkerType.ENGINEER, parseTextFieldValue(fields[2])
-        );
+    private Map<WorkerType, Integer> getWorkerQuantities(Map<WorkerType, TextField> textFieldMap) {
+        return PopupUtils.getQuantities(WorkerType.values(), textFieldMap.values().toArray(new TextField[0]));
     }
 
     private boolean canHireWorkers(Map<WorkerType, Integer> fireQuantities) {
@@ -102,73 +92,24 @@ public class HiringCenterPopupController {
         return true;
     }
 
-    private boolean canHireMultipleWorkers(Map<WorkerType, Integer> buyQuantities) {
-        int cowboyCount = player.getWorkerDeck().getOrDefault(WorkerType.COWBOY, 0);
-        if (cowboyCount < 5) {
-            return buyQuantities.values().stream().filter(q -> q > 0).count() <= 1;
-        }
-        return true;
-    }
-
-    private int calculateTotalCost(Map<WorkerType, Integer> hireQuantities, Map<WorkerType, Integer> fireQuantities) {
-        int incomeFromSelling = fireQuantities.entrySet().stream()
-                .mapToInt(entry -> entry.getValue() * entry.getKey().getCost())
-                .sum();
-        int costForBuying = hireQuantities.entrySet().stream()
-                .mapToInt(entry -> entry.getValue() * entry.getKey().getCost())
-                .sum();
-        return costForBuying - incomeFromSelling;
-    }
-
     private void updateWorkerDeck(Map<WorkerType, Integer> hireQuantities, Map<WorkerType, Integer> fireQuantities) {
-        Map<WorkerType, Integer> workerDeck = player.getWorkerDeck();
-        for (WorkerType workerType : WorkerType.values()) {
-            int bought = hireQuantities.getOrDefault(workerType, 0);
-            int sold = fireQuantities.getOrDefault(workerType, 0);
-            workerDeck.put(workerType, workerDeck.getOrDefault(workerType, 0) + bought - sold);
-        }
+        PopupUtils.updateDeck(player.getWorkerDeck(), hireQuantities, fireQuantities);
         updateSellingTextFields();
     }
 
-    private void updateSellingTextFields() {
-        for (WorkerType workerType : WorkerType.values()) {
-            TextField fireField = getFireTextField(workerType);
-            fireField.setDisable(player.getWorkerDeck().getOrDefault(workerType, 0) == 0);
-        }
-    }
-
-    private TextField getFireTextField(WorkerType workerType) {
-        return switch (workerType) {
-            case COWBOY -> tfFireCowboyQuantity;
-            case BUILDER -> tfFireBuilderQuantity;
-            case ENGINEER -> tfFireEngineerQuantity;
-            default -> throw new IllegalArgumentException("Unknown worker type: " + workerType);
-        };
-    }
-
-    private int calculateVPs(Map<WorkerType, Integer> hireQuantities, Map<WorkerType, Integer> fireQuantities) {
-        return hireQuantities.entrySet().stream()
-                .mapToInt(entry -> (entry.getValue() + fireQuantities.getOrDefault(entry.getKey(), 0)) * entry.getKey().getVp())
-                .sum();
-    }
-
-    private void addCostCalculationListener(TextField... textFields) {
-        for (TextField textField : textFields) {
-            textField.textProperty().addListener((observable, oldValue, newValue) -> updateTotalCost());
-        }
+    public void updateSellingTextFields() {
+        PopupUtils.updateSellingTextFields(fireTextFieldMap, player.getWorkerDeck(), WorkerType.values());
     }
 
     private void updateTotalCost() {
-        Map<WorkerType, Integer> hireQuantities = getWorkerQuantities(tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity);
-        Map<WorkerType, Integer> fireQuantities = getWorkerQuantities(tfFireCowboyQuantity, tfFireBuilderQuantity, tfFireEngineerQuantity);
-        int totalCostValue = calculateTotalCost(hireQuantities, fireQuantities);
+        Map<WorkerType, Integer> hireQuantities = getWorkerQuantities(hireTextFieldMap);
+        Map<WorkerType, Integer> fireQuantities = getWorkerQuantities(fireTextFieldMap);
+        int totalCostValue = PopupUtils.calculateTransactionCost(hireQuantities, fireQuantities);
         totalCost.setText(totalCostValue + "$");
     }
 
     private void resetTextFields() {
-        List
-                .of(tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity,
-                        tfFireCowboyQuantity, tfFireBuilderQuantity, tfFireEngineerQuantity)
-                .forEach(tf -> tf.setText("0"));
+        PopupUtils.resetTextFields(tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity,
+                tfFireCowboyQuantity, tfFireBuilderQuantity, tfFireEngineerQuantity);
     }
 }

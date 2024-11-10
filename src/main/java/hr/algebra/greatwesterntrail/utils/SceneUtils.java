@@ -5,7 +5,9 @@ import hr.algebra.greatwesterntrail.controller.CowDeckController;
 import hr.algebra.greatwesterntrail.controller.WorkerDeckController;
 import hr.algebra.greatwesterntrail.model.Player;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.lang.reflect.Method;

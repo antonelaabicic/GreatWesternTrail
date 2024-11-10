@@ -1,7 +1,11 @@
 package hr.algebra.greatwesterntrail.utils;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.util.Optional;
 

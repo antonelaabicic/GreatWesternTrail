@@ -1,14 +1,11 @@
 package hr.algebra.greatwesterntrail.model;
 
 import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
-import hr.algebra.greatwesterntrail.controller.BoardController;
 import hr.algebra.greatwesterntrail.utils.DialogUtils;
 import hr.algebra.greatwesterntrail.utils.SceneUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import lombok.Getter;
-
-import static hr.algebra.greatwesterntrail.model.TileType.HAZARD;
 
 public class TileButton extends Button {
     @Getter

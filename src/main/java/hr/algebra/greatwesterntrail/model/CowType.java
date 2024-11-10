@@ -1,8 +1,9 @@
 package hr.algebra.greatwesterntrail.model;
 
+import hr.algebra.greatwesterntrail.shared.Tradeable;
 import lombok.Getter;
 
-public enum CowType {
+public enum CowType implements Tradeable {
     HOLSTEIN(1, 1),
     JERSEY(5, 5),
     BLACK_ANGUS(10, 10),

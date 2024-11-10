@@ -4,12 +4,12 @@ import hr.algebra.greatwesterntrail.model.CowType;
 import hr.algebra.greatwesterntrail.model.Player;
 import hr.algebra.greatwesterntrail.model.WorkerType;
 import hr.algebra.greatwesterntrail.utils.DialogUtils;
+import hr.algebra.greatwesterntrail.utils.PopupUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-import java.util.List;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class CowExchangePopupController {
@@ -24,41 +24,37 @@ public class CowExchangePopupController {
     public Button btnConfirm;
 
     private Player player;
+    private Map<CowType, TextField> buyTextFieldMap = new EnumMap<>(CowType.class);
+    private Map<CowType, TextField> sellTextFieldMap = new EnumMap<>(CowType.class);
 
     public void initialize(Player player) {
         this.player = player;
+        initializeTextFieldMaps();
 
-        setInputValidation(tfBuyHolsteinQuantity, tfBuyJerseyQuantity, tfBuyAngusQuantity, tfBuyLonghornQuantity,
-                tfSellHolsteinQuantity, tfSellJerseyQuantity, tfSellAngusQuantity, tfSellLonghornQuantity);
+        PopupUtils.setInputValidation(
+                tfBuyHolsteinQuantity, tfBuyJerseyQuantity, tfBuyAngusQuantity, tfBuyLonghornQuantity,
+                tfSellHolsteinQuantity, tfSellJerseyQuantity, tfSellAngusQuantity, tfSellLonghornQuantity
+        );
 
         btnConfirm.setOnAction(event -> confirmPurchase());
+
+        PopupUtils.addCostCalculationListener(this::updateTotalCost,
+                tfBuyHolsteinQuantity, tfBuyJerseyQuantity, tfBuyAngusQuantity, tfBuyLonghornQuantity,
+                tfSellHolsteinQuantity, tfSellJerseyQuantity, tfSellAngusQuantity, tfSellLonghornQuantity
+        );
+
         updateSellingTextFields();
-
-        addCostCalculationListener(tfBuyHolsteinQuantity, tfBuyJerseyQuantity, tfBuyAngusQuantity, tfBuyLonghornQuantity,
-                tfSellHolsteinQuantity, tfSellJerseyQuantity, tfSellAngusQuantity, tfSellLonghornQuantity);
-
         updateTotalCost();
     }
 
-    private void setInputValidation(TextField... textFields) {
-        for (TextField textField : textFields) {
-            textField.addEventFilter(KeyEvent.KEY_TYPED, event -> {
-                if (!event.getCharacter().matches("\\d")) {
-                    event.consume();
-                }
-            });
-        }
-    }
-
-    private int parseTextFieldValue(TextField textField) {
-        return textField.getText().isEmpty() ? 0 : Integer.parseInt(textField.getText());
+    private void initializeTextFieldMaps() {
+        buyTextFieldMap = PopupUtils.createEnumTextFieldMap(CowType.class, tfBuyHolsteinQuantity, tfBuyJerseyQuantity, tfBuyAngusQuantity, tfBuyLonghornQuantity);
+        sellTextFieldMap = PopupUtils.createEnumTextFieldMap(CowType.class, tfSellHolsteinQuantity, tfSellJerseyQuantity, tfSellAngusQuantity, tfSellLonghornQuantity);
     }
 
     private void confirmPurchase() {
-        Map<CowType, Integer> buyQuantities = getCowQuantities(tfBuyHolsteinQuantity, tfBuyJerseyQuantity,
-                tfBuyAngusQuantity, tfBuyLonghornQuantity);
-        Map<CowType, Integer> sellQuantities = getCowQuantities(tfSellHolsteinQuantity, tfSellJerseyQuantity,
-                tfSellAngusQuantity, tfSellLonghornQuantity);
+        Map<CowType, Integer> buyQuantities = getCowQuantities(buyTextFieldMap);
+        Map<CowType, Integer> sellQuantities = getCowQuantities(sellTextFieldMap);
 
         if (!canSellCows(sellQuantities)) {
             DialogUtils.showDialog("Invalid sale", "You cannot sell more cows than you currently own.", Alert.AlertType.WARNING);
@@ -72,7 +68,7 @@ public class CowExchangePopupController {
             return;
         }
 
-        int totalCostValue = calculateTotalCost(buyQuantities, sellQuantities);
+        int totalCostValue = PopupUtils.calculateTransactionCost(buyQuantities, sellQuantities);
         if (totalCostValue > player.getMoney()) {
             DialogUtils.showDialog("Insufficient funds", "You don't have enough money to complete the purchase.", Alert.AlertType.WARNING);
             resetTextFields();
@@ -82,7 +78,7 @@ public class CowExchangePopupController {
         updateCowDeck(buyQuantities, sellQuantities);
         player.setMoney(player.getMoney() - totalCostValue);
 
-        int earnedVP = calculateVPs(buyQuantities, sellQuantities);
+        int earnedVP = PopupUtils.calculateVPs(buyQuantities, sellQuantities);
         player.setVp(player.getVp() + earnedVP);
 
         DialogUtils.showDialog("Transaction complete",
@@ -91,13 +87,8 @@ public class CowExchangePopupController {
         ((Stage) btnConfirm.getScene().getWindow()).close();
     }
 
-    private Map<CowType, Integer> getCowQuantities(TextField... fields) {
-        return Map.of(
-                CowType.HOLSTEIN, parseTextFieldValue(fields[0]),
-                CowType.JERSEY, parseTextFieldValue(fields[1]),
-                CowType.BLACK_ANGUS, parseTextFieldValue(fields[2]),
-                CowType.TEXAS_LONGHORN, parseTextFieldValue(fields[3])
-        );
+    private Map<CowType, Integer> getCowQuantities(Map<CowType, TextField> textFieldMap) {
+        return PopupUtils.getQuantities(CowType.values(), textFieldMap.values().toArray(new TextField[0]));
     }
 
     private boolean canSellCows(Map<CowType, Integer> sellQuantities) {
@@ -117,66 +108,26 @@ public class CowExchangePopupController {
         return true;
     }
 
-    private int calculateTotalCost(Map<CowType, Integer> buyQuantities, Map<CowType, Integer> sellQuantities) {
-        int incomeFromSelling = sellQuantities.entrySet().stream()
-                .mapToInt(entry -> entry.getValue() * entry.getKey().getCost())
-                .sum();
-        int costForBuying = buyQuantities.entrySet().stream()
-                .mapToInt(entry -> entry.getValue() * entry.getKey().getCost())
-                .sum();
-        return costForBuying - incomeFromSelling;
-    }
-
     private void updateCowDeck(Map<CowType, Integer> buyQuantities, Map<CowType, Integer> sellQuantities) {
-        Map<CowType, Integer> cowDeck = player.getCowDeck();
-        for (CowType cowType : CowType.values()) {
-            int bought = buyQuantities.getOrDefault(cowType, 0);
-            int sold = sellQuantities.getOrDefault(cowType, 0);
-            cowDeck.put(cowType, cowDeck.getOrDefault(cowType, 0) + bought - sold);
-        }
+        PopupUtils.updateDeck(player.getCowDeck(), buyQuantities, sellQuantities);
         updateSellingTextFields();
     }
 
     private void updateSellingTextFields() {
-        for (CowType cowType : CowType.values()) {
-            TextField sellField = getSellTextField(cowType);
-            sellField.setDisable(player.getCowDeck().getOrDefault(cowType, 0) == 0);
-        }
-    }
-
-    private TextField getSellTextField(CowType cowType) {
-        return switch (cowType) {
-            case HOLSTEIN -> tfSellHolsteinQuantity;
-            case JERSEY -> tfSellJerseyQuantity;
-            case BLACK_ANGUS -> tfSellAngusQuantity;
-            case TEXAS_LONGHORN -> tfSellLonghornQuantity;
-            default -> throw new IllegalArgumentException("Unknown cow type: " + cowType);
-        };
-    }
-
-    private int calculateVPs(Map<CowType, Integer> buyQuantities, Map<CowType, Integer> sellQuantities) {
-        return buyQuantities.entrySet().stream()
-                .mapToInt(entry -> (entry.getValue() + sellQuantities.getOrDefault(entry.getKey(), 0)) * entry.getKey().getVp())
-                .sum();
-    }
-
-    private void addCostCalculationListener(TextField... textFields) {
-        for (TextField textField : textFields) {
-            textField.textProperty().addListener((observable, oldValue, newValue) -> updateTotalCost());
-        }
+        PopupUtils.updateSellingTextFields(sellTextFieldMap, player.getCowDeck(), CowType.values() );
     }
 
     private void updateTotalCost() {
-        Map<CowType, Integer> buyQuantities = getCowQuantities(tfBuyHolsteinQuantity, tfBuyJerseyQuantity, tfBuyAngusQuantity, tfBuyLonghornQuantity);
-        Map<CowType, Integer> sellQuantities = getCowQuantities(tfSellHolsteinQuantity, tfSellJerseyQuantity, tfSellAngusQuantity, tfSellLonghornQuantity);
-        int totalCostValue = calculateTotalCost(buyQuantities, sellQuantities);
+        Map<CowType, Integer> buyQuantities = getCowQuantities(buyTextFieldMap);
+        Map<CowType, Integer> sellQuantities = getCowQuantities(sellTextFieldMap);
+        int totalCostValue = PopupUtils.calculateTransactionCost(buyQuantities, sellQuantities);
         totalCost.setText(totalCostValue + "$");
     }
 
     private void resetTextFields() {
-        List
-                .of(tfBuyHolsteinQuantity, tfBuyJerseyQuantity, tfBuyAngusQuantity, tfBuyLonghornQuantity,
-                        tfSellHolsteinQuantity, tfSellJerseyQuantity, tfSellAngusQuantity, tfSellLonghornQuantity)
-                .forEach(tf -> tf.setText("0"));
+        PopupUtils.resetTextFields(
+                tfBuyHolsteinQuantity, tfBuyJerseyQuantity, tfBuyAngusQuantity, tfBuyLonghornQuantity,
+                tfSellHolsteinQuantity, tfSellJerseyQuantity, tfSellAngusQuantity, tfSellLonghornQuantity
+        );
     }
 }

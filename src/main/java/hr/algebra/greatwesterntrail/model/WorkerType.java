@@ -1,11 +1,12 @@
 package hr.algebra.greatwesterntrail.model;
 
+import hr.algebra.greatwesterntrail.shared.Tradeable;
 import lombok.Getter;
 
-public enum WorkerType {
+public enum WorkerType implements Tradeable {
+    COWBOY(5, 1),
     BUILDER(5, 1),
-    ENGINEER(5, 1),
-    COWBOY(5, 1);
+    ENGINEER(5, 1);
 
     @Getter
     private final int cost;
