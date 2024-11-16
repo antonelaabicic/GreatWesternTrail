@@ -1,40 +1,29 @@
 package hr.algebra.greatwesterntrail.controller;
 
 import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
-import hr.algebra.greatwesterntrail.model.Player;
-import hr.algebra.greatwesterntrail.model.Tile;
-import hr.algebra.greatwesterntrail.model.TileButton;
+import hr.algebra.greatwesterntrail.model.*;
 import hr.algebra.greatwesterntrail.repository.TileRepository;
-import hr.algebra.greatwesterntrail.utils.DialogUtils;
-import hr.algebra.greatwesterntrail.utils.ImageUtils;
-import hr.algebra.greatwesterntrail.utils.SceneUtils;
+import hr.algebra.greatwesterntrail.utils.*;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
+import javafx.scene.layout.StackPane;
+
+import java.util.Arrays;
 
 public class BoardController {
 
     @FXML
-    public Button btnPoints;
-    @FXML
-    public Button btnMoney;
-    @FXML
-    public Button btnWorkers;
-    @FXML
-    public Button btnDeck;
+    public Button btnPoints, btnMoney, btnWorkers, btnDeck;
 
     @FXML
     public GridPane boardGrid;
+    @FXML
+    public VerticalProgressBar pbTrain;
 
     private TileRepository tileRepository;
     private TileButton[][] tileButtons = new TileButton[TileRepository.GRID_SIZE][TileRepository.GRID_SIZE];
@@ -45,19 +34,30 @@ public class BoardController {
         tileRepository = TileRepository.INSTANCE;
         initializeBoard();
         setupButtons();
+
+        TrainProgressUtils.updateTrainProgressBar(pbTrain, player.getWorkerDeck().getOrDefault(WorkerType.ENGINEER, 0));
+
+        Platform.runLater(() -> {
+            boardGrid.requestFocus();
+            TileUtils.highlightCurrentTile(player.getPlayerPosition(), tileButtons);
+        });
+
+        boardGrid.setOnKeyPressed(event -> GameUtils.handleKeyboardNavigation(event, player, tileButtons));
+        player.setOnTrainProgressMaxReached(GameStateUtils::showWinnerDialog);
+        player.setOnGameOver(p -> UIUtils.disableGameScreen(this, p));
     }
 
     private void initializeBoard() {
         boardGrid.getChildren().clear();
-
         Tile[][] tiles = tileRepository.getTiles();
 
         for (int row = 0; row < TileRepository.GRID_SIZE; row++) {
             for (int col = 0; col < TileRepository.GRID_SIZE; col++) {
                 Tile tile = tiles[row][col];
-                TileButton tileButton = new TileButton(tile, player);
-                tileButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-                boardGrid.add(tileButton, col, row);
+                StackPane tileStack = TileUtils.createTileStack(tile, player, this);
+                boardGrid.add(tileStack, col, row);
+
+                TileButton tileButton = (TileButton) tileStack.getChildren().getFirst();
                 tileButtons[row][col] = tileButton;
             }
         }

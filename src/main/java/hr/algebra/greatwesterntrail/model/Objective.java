@@ -23,4 +23,8 @@ public class Objective {
     public int calculateTotalVictoryPoints() {
         return action.getVictoryPoints() * quantity;
     }
+
+    public boolean isCompletedByPlayer(Player player) {
+        return player.hasMetObjective(this);
+    }
 }

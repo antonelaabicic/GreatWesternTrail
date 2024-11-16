@@ -1,5 +1,7 @@
 package hr.algebra.greatwesterntrail.utils;
 
+import hr.algebra.greatwesterntrail.controller.BoardController;
+import hr.algebra.greatwesterntrail.controller.HiringCenterPopupController;
 import hr.algebra.greatwesterntrail.model.Player;
 import hr.algebra.greatwesterntrail.model.TileButton;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +26,72 @@ public final class SceneUtils {
         }
     }
 
-    public static void loadScene(Class<?> appClass, String fxmlPath, String title, Player player, TileButton tileButton) {
+//    public static void loadScene(Class<?> appClass, String fxmlPath, String title, Player player, TileButton tileButton) {
+//        try {
+//            FXMLLoader loader = new FXMLLoader(appClass.getResource(fxmlPath));
+//            Scene scene = new Scene(loader.load());
+//
+//            Stage stage = new Stage();
+//            stage.setTitle(title);
+//            stage.setScene(scene);
+//
+//            Object controller = loader.getController();
+//            invokeInitializeIfPresent(controller, player, tileButton);
+//
+//            stage.show();
+//        } catch (Exception e) {
+//            System.out.println("Error loading scene: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
+
+//    public static void loadScene(Class<?> appClass, String fxmlPath, String title, Player player) {
+//        loadScene(appClass, fxmlPath, title, player, null);
+//    }
+
+//    private static void invokeInitializeIfPresent(Object controller, Player player, TileButton tileButton) {
+//        if (controller != null) {
+//            try {
+//                Method initializeMethod;
+//                if (tileButton != null) {
+//                    initializeMethod = controller.getClass().getMethod("initialize", Player.class, TileButton.class);
+//                    initializeMethod.invoke(controller, player, tileButton);
+//                } else {
+//                    initializeMethod = controller.getClass().getMethod("initialize", Player.class);
+//                    initializeMethod.invoke(controller, player);
+//                }
+//
+//            } catch (NoSuchMethodException e) {
+//                System.err.println("No compatible initialize method found for controller: " + controller.getClass().getName());
+//            } catch (Exception e) {
+//                System.err.println("Error invoking initialize method on controller: " + e.getMessage());
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+//    public static void loadFuck(Class<?> appClass, String fxmlPath, String title, Player player, BoardController boardController) {
+//        try {
+//            FXMLLoader loader = new FXMLLoader(appClass.getResource(fxmlPath));
+//            Scene scene = new Scene(loader.load());
+//
+//            Stage stage = new Stage();
+//            stage.setTitle(title);
+//            stage.setScene(scene);
+//
+//            Object controller = loader.getController();
+//            if (controller instanceof HiringCenterPopupController) {
+//                ((HiringCenterPopupController) controller).initialize(player, boardController);
+//            }
+//
+//            stage.show();
+//        } catch (Exception e) {
+//            System.out.println("Error loading scene: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
+
+    public static void loadScene(Class<?> appClass, String fxmlPath, String title, Object... dependencies) {
         try {
             FXMLLoader loader = new FXMLLoader(appClass.getResource(fxmlPath));
             Scene scene = new Scene(loader.load());
@@ -34,7 +101,9 @@ public final class SceneUtils {
             stage.setScene(scene);
 
             Object controller = loader.getController();
-            invokeInitializeIfPresent(controller, player, tileButton);
+            if (controller != null) {
+                invokeMatchingInitializeMethod(controller, dependencies);
+            }
 
             stage.show();
         } catch (Exception e) {
@@ -43,28 +112,33 @@ public final class SceneUtils {
         }
     }
 
-    public static void loadScene(Class<?> appClass, String fxmlPath, String title, Player player) {
-        loadScene(appClass, fxmlPath, title, player, null);
-    }
+    private static void invokeMatchingInitializeMethod(Object controller, Object... dependencies) {
+        Method[] methods = controller.getClass().getDeclaredMethods();
 
-    private static void invokeInitializeIfPresent(Object controller, Player player, TileButton tileButton) {
-        if (controller != null) {
-            try {
-                Method initializeMethod;
-                if (tileButton != null) {
-                    initializeMethod = controller.getClass().getMethod("initialize", Player.class, TileButton.class);
-                    initializeMethod.invoke(controller, player, tileButton);
-                } else {
-                    initializeMethod = controller.getClass().getMethod("initialize", Player.class);
-                    initializeMethod.invoke(controller, player);
+        for (Method method : methods) {
+            if (method.getName().equals("initialize")) {
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                if (parameterTypes.length == dependencies.length) {
+                    boolean matches = true;
+                    for (int i = 0; i < parameterTypes.length; i++) {
+                        if (!parameterTypes[i].isAssignableFrom(dependencies[i].getClass())) {
+                            matches = false;
+                            break;
+                        }
+                    }
+                    if (matches) {
+                        try {
+                            method.invoke(controller, dependencies);
+                            return;
+                        } catch (Exception e) {
+                            System.err.println("Error invoking initialize method: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
                 }
-
-            } catch (NoSuchMethodException e) {
-                System.err.println("No compatible initialize method found for controller: " + controller.getClass().getName());
-            } catch (Exception e) {
-                System.err.println("Error invoking initialize method on controller: " + e.getMessage());
-                e.printStackTrace();
             }
         }
+
+        System.err.println("No matching initialize method found for controller: " + controller.getClass().getName());
     }
 }

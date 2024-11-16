@@ -110,6 +110,11 @@ public class CowExchangePopupController {
 
     private void updateCowDeck(Map<CowType, Integer> buyQuantities, Map<CowType, Integer> sellQuantities) {
         PopupUtils.updateDeck(player.getCowDeck(), buyQuantities, sellQuantities);
+        //
+        buyQuantities.forEach((cowType, count) -> {
+            int newCount = player.getCowDeck().getOrDefault(cowType, 0);
+            player.updatePeakValues(cowType, newCount);
+        });
         updateSellingTextFields();
     }
 

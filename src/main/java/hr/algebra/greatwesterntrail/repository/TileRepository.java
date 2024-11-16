@@ -3,6 +3,7 @@ package hr.algebra.greatwesterntrail.repository;
 import hr.algebra.greatwesterntrail.model.*;
 import hr.algebra.greatwesterntrail.utils.ImageUtils;
 import javafx.geometry.Pos;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import lombok.Getter;
@@ -68,7 +69,13 @@ public enum TileRepository {
             Objective objective = createObjectiveForBuilding(tileWithObjective.getBuildingType());
             tileWithObjective.setObjective(objective);
             ImageUtils.addIconToStackPane(tileWithObjective.getIcons(), "../images/scroll_icon.png", 20, 20, Pos.TOP_LEFT);
+            addObjectiveTooltip(tileWithObjective, objective);
         }
+    }
+
+    private void addObjectiveTooltip(Tile tile, Objective objective) {
+        Tooltip tooltip = new Tooltip(objective.getDescription());
+        Tooltip.install(tile.getIcons(), tooltip);
     }
 
     private Objective createObjectiveForBuilding(BuildingType buildingType) {
@@ -92,7 +99,7 @@ public enum TileRepository {
                 break;
             case TRAIN_STATION:
                 action = ObjectiveAction.ADVANCE_TRAIN_PROGRESS;
-                quantity = 1;
+                quantity = random.nextInt(5) + 1;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid building type!");

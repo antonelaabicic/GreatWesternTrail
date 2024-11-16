@@ -13,14 +13,12 @@ public class Tile {
     private BuildingType buildingType;
     private HazardType hazardType;
     private Objective objective;
-    private boolean completed;
     private StackPane icons;
 
     public Tile(BuildingType buildingType, Objective objective) {
         this.tileType = TileType.BUILDING;
         this.buildingType = buildingType;
         this.objective = objective;
-        this.completed = false;
         this.icons = new StackPane();
         setupIcons();
     }
@@ -56,9 +54,9 @@ public class Tile {
                 break;
             case HAZARD:
                 icon = switch (hazardType) {
-                    case FLOOD -> ImageUtils.createImageView("../images/flood_icon.png", 100, 100);
-                    case ROCKSLIDE -> ImageUtils.createImageView("../images/rockslide_icon.png", 100, 100);
-                    case BANDITS -> ImageUtils.createImageView("../images/bandit_icon.png", 100, 100);
+                    case FLOOD -> ImageUtils.createImageView("../images/flood_icon.png", 95, 95);
+                    case ROCKSLIDE -> ImageUtils.createImageView("../images/rockslide_icon.png", 95, 95);
+                    case BANDITS -> ImageUtils.createImageView("../images/bandit_icon.png", 95, 95);
                 };
                 break;
             case START:
@@ -68,7 +66,7 @@ public class Tile {
                 icon = ImageUtils.createImageView("../images/kansas_icon.png", 100, 100);
                 break;
             case EMPTY:
-                icon = ImageUtils.createImageView("../images/grass_icon.png", 100, 100);
+                icon = ImageUtils.createImageView("../images/grass_icon.png", 95, 95);
                 break;
         }
         if (icon != null) {

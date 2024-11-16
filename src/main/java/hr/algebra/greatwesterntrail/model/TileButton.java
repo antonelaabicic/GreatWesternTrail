@@ -1,27 +1,38 @@
 package hr.algebra.greatwesterntrail.model;
 
 import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
-import hr.algebra.greatwesterntrail.utils.DialogUtils;
-import hr.algebra.greatwesterntrail.utils.SceneUtils;
+import hr.algebra.greatwesterntrail.controller.BoardController;
+import hr.algebra.greatwesterntrail.utils.*;
+import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import lombok.Getter;
+
+import java.util.Random;
 
 public class TileButton extends Button {
     @Getter
     private final Tile tile;
     private final Player player;
+    private final BoardController boardController;
 
     private static final int CROSS_HAZARD_COST = 5;
     private static final int REMOVE_HAZARD_COST = 20;
     private static final int CROSS_HAZARD_VP = 5;
     private static final int REMOVE_HAZARD_VP = 20;
 
-    public TileButton(Tile tile, Player player) {
+    public TileButton(Tile tile, Player player, BoardController boardController) {
         this.tile = tile;
         this.player = player;
+        this.boardController = boardController;
         setGraphic(tile.getIcons());
-        this.setOnAction(event -> handleTileAction());
+
+        this.setOnMouseClicked(Event::consume);
+        this.setFocusTraversable(false);
+    }
+
+    public void performAction() {
+        handleTileAction();
     }
 
     private void handleTileAction() {
@@ -42,6 +53,9 @@ public class TileButton extends Button {
                     case TRAIN_STATION -> showTrainStationDialog();
                     default -> throw new IllegalArgumentException("Invalid building type!");
                 }
+            }
+            case END -> {
+                GameStateUtils.showWinnerDialog(player);
             }
         }
     }
@@ -90,16 +104,24 @@ public class TileButton extends Button {
         }
     }
 
-
     private void showTrainStationDialog() {
-
+        Random random = new Random();
+        int steps = 1 + random.nextInt(5);
+        player.incrementTrainProgress(steps);
+        player.setTrainProgress(player.getTrainProgress());
+        TrainProgressUtils.updateTrainProgressBar(boardController.pbTrain, player.getTrainProgress());
+        DialogUtils.showDialog(
+                "Success",
+                "You've moved " + steps + " on the train track!",
+                Alert.AlertType.INFORMATION);
     }
 
     private void showHiringCenterDialog() {
         SceneUtils.loadScene(GreatWesternTrailApplication.class,
                 "view/hiringCenterPopup.fxml",
                 "Hiring Center",
-                player);
+                player,
+                boardController);
     }
 
     private void showCattleExchangeDialog() {

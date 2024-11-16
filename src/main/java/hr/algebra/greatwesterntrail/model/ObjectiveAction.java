@@ -12,14 +12,14 @@ public enum ObjectiveAction {
     SELL_ANGUS(10, 10, "Sell Black Angus"),
     SELL_LONGHORN(20, 20, "Sell Texas Longhorn"),
 
-    HIRE_COWBOY(5, 5, "Hire a Cowboy"),
-    HIRE_ENGINEER(5, 5, "Hire an Engineer"),
-    HIRE_BUILDER(5, 5, "Hire a Builder"),
-    FIRE_COWBOY(5, 5, "Fire a Cowboy"),
-    FIRE_ENGINEER(5, 5, "Fire an Engineer"),
-    FIRE_BUILDER(5,5, "Fire a Builder"),
+    HIRE_COWBOY(5, 1, "Hire cowboy"),
+    HIRE_ENGINEER(5, 1, "Hire engineer"),
+    HIRE_BUILDER(5, 1, "Hire builder"),
+    FIRE_COWBOY(5, 1, "Fire cowboy"),
+    FIRE_ENGINEER(5, 1, "Fire engineer"),
+    FIRE_BUILDER(5,1, "Fire builder"),
 
-    ADVANCE_TRAIN_PROGRESS(0, 0, "Advance train progress");
+    ADVANCE_TRAIN_PROGRESS(5, 1, "Advance train progress");
 
     @Getter
     private final int cost;
@@ -32,5 +32,21 @@ public enum ObjectiveAction {
         this.cost = cost;
         this.victoryPoints = victoryPoints;
         this.baseDescription = baseDescription;
+    }
+
+    public boolean isBuyAction() {
+        return this == BUY_JERSEY || this == BUY_ANGUS || this == BUY_LONGHORN || this == BUY_HOLSTEIN;
+    }
+
+    public boolean isSellAction() {
+        return this == SELL_JERSEY || this == SELL_ANGUS || this == SELL_LONGHORN || this == SELL_HOLSTEIN;
+    }
+
+    public boolean isHireAction() {
+        return this == HIRE_COWBOY || this == HIRE_ENGINEER || this == HIRE_BUILDER;
+    }
+
+    public boolean isFireAction() {
+        return this == FIRE_COWBOY || this == FIRE_ENGINEER || this == FIRE_BUILDER;
     }
 }

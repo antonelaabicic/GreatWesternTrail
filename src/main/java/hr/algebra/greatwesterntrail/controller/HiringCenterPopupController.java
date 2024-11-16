@@ -2,8 +2,7 @@ package hr.algebra.greatwesterntrail.controller;
 
 import hr.algebra.greatwesterntrail.model.Player;
 import hr.algebra.greatwesterntrail.model.WorkerType;
-import hr.algebra.greatwesterntrail.utils.DialogUtils;
-import hr.algebra.greatwesterntrail.utils.PopupUtils;
+import hr.algebra.greatwesterntrail.utils.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -26,11 +25,13 @@ public class HiringCenterPopupController {
     public Button btnConfirm;
 
     private Player player;
+    private BoardController boardController;
     private Map<WorkerType, TextField> hireTextFieldMap = new EnumMap<>(WorkerType.class);
     private Map<WorkerType, TextField> fireTextFieldMap = new EnumMap<>(WorkerType.class);
 
-    public void initialize(Player player) {
+    public void initialize(Player player, BoardController boardController) {
         this.player = player;
+        this.boardController = boardController;
         initializeTextFieldMaps();
 
         PopupUtils.setInputValidation(tfHireCowboyQuantity, tfHireBuilderQuantity, tfHireEngineerQuantity,
@@ -43,6 +44,7 @@ public class HiringCenterPopupController {
 
         updateSellingTextFields();
         updateTotalCost();
+        player.setOnTrainProgressMaxReached(GameStateUtils::showWinnerDialog);
     }
 
     private void initializeTextFieldMaps() {
@@ -67,9 +69,13 @@ public class HiringCenterPopupController {
             return;
         }
 
+        int firstEngineerCount = player.getWorkerDeck().getOrDefault(WorkerType.ENGINEER, 0);
         updateWorkerDeck(hireQuantities, fireQuantities);
-        player.setMoney(player.getMoney() - totalCostValue);
+        int additionalEngineerCount = player.getWorkerDeck().getOrDefault(WorkerType.ENGINEER, 0) ;
+        player.incrementTrainProgress(additionalEngineerCount - firstEngineerCount);
+        TrainProgressUtils.updateTrainProgressBar(boardController.pbTrain, player.getTrainProgress());
 
+        player.setMoney(player.getMoney() - totalCostValue);
         int earnedVP = PopupUtils.calculateVPs(hireQuantities, fireQuantities);;
         player.setVp(player.getVp() + earnedVP);
 
@@ -94,6 +100,11 @@ public class HiringCenterPopupController {
 
     private void updateWorkerDeck(Map<WorkerType, Integer> hireQuantities, Map<WorkerType, Integer> fireQuantities) {
         PopupUtils.updateDeck(player.getWorkerDeck(), hireQuantities, fireQuantities);
+        //
+        hireQuantities.forEach((workerType, count) -> {
+            int newCount = player.getWorkerDeck().getOrDefault(workerType, 0);
+            player.updatePeakValues(workerType, newCount);
+        });
         updateSellingTextFields();
     }
 
