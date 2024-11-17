@@ -2,11 +2,9 @@ package hr.algebra.greatwesterntrail.utils;
 
 import java.io.IOException;
 import java.lang.reflect.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 public final class DocumentationUtils {
 
@@ -18,12 +16,13 @@ public final class DocumentationUtils {
 
     public static void generateDocumentation() throws RuntimeException {
         try (Stream<Path> paths = Files.walk(Paths.get(BASE_PATH))) {
-            List<Path> classList = paths
-                    .filter(path -> path.getFileName().toString().endsWith(CLASS_FILE_EXTENSION)
+            List<Class<?>> classes = paths.filter(path -> path.getFileName().toString().endsWith(CLASS_FILE_EXTENSION)
                             && Character.isUpperCase(path.getFileName().toString().charAt(0)))
-                    .toList();
+                    .map(DocumentationUtils::getClassFromPath)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
 
-            String htmlCode = generateHtmlCode(classList);
+            String htmlCode = generateHtmlCode(classes);
             Files.createDirectories(Path.of("doc"));
             Files.writeString(Path.of(HTML_DOCUMENTATION_FILENAME), htmlCode);
         } catch (IOException e) {
@@ -31,9 +30,20 @@ public final class DocumentationUtils {
         }
     }
 
-    private static String generateHtmlCode(List<Path> classList) {
-        StringBuilder sb = new StringBuilder();
+    private static Class<?> getClassFromPath(Path classPath) {
+        String className = classPath.toString()
+                .substring(BASE_PATH.length(), classPath.toString().length() - CLASS_FILE_EXTENSION.length())
+                .replace("\\", ".");
+        try {
+            Class<?> clazz = Class.forName(className);
+            return (clazz.isAnonymousClass() || clazz.isSynthetic() || clazz.getSimpleName().contains("$")) ? null : clazz;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to process class: " + className, e);
+        }
+    }
 
+    private static String generateHtmlCode(List<Class<?>> classes) {
+        StringBuilder sb = new StringBuilder();
         sb.append("""
                 <!DOCTYPE html>
                 <html lang="en">
@@ -53,176 +63,140 @@ public final class DocumentationUtils {
                 <body>
                 <h1>Great Western Trail Documentation</h1>
                 <p>This documentation lists all classes, constructors, fields, methods, and annotations in the application.</p>
-                <h2>Interfaces:</h2>
                 """);
 
-        Set<String> processedClasses = new HashSet<>();
-        List<Class<?>> interfaces = new ArrayList<>();
-        List<Class<?>> enums = new ArrayList<>();
-        List<Class<?>> classes = new ArrayList<>();
+        Map<String, List<Class<?>>> categorizedClasses = categorizeClasses(classes);
+        for (Map.Entry<String, List<Class<?>>> entry : categorizedClasses.entrySet()) {
+            String section = entry.getKey();
+            List<Class<?>> classList = entry.getValue();
 
-        for (Path classPath : classList) {
-            String className = classPath
-                    .toString()
-                    .substring(BASE_PATH.length(), classPath.toString().length() - CLASS_FILE_EXTENSION.length())
-                    .replace("\\", ".");
+            if ("Interface".equals(section)) { sb.append("<h2>Interfaces</h2>"); }
+            else if ("Enum".equals(section)) { sb.append("<h2>Enums</h2>"); }
+            else if ("Class".equals(section)) { sb.append("<h2>Classes</h2>"); }
 
-            try {
-                Class<?> clazz = Class.forName(className);
-                if (clazz.isAnonymousClass() || clazz.isSynthetic() || clazz.getSimpleName().contains("$")) {
-                    continue;
-                }
-                if (!processedClasses.add(clazz.getName())) { continue; }
-                if (clazz.isInterface()) { interfaces.add(clazz); }
-                else if (clazz.isEnum()) { enums.add(clazz); }
-                else { classes.add(clazz); }
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException("Failed to process class: " + className, e);
+            for (Class<?> clazz : classList) {
+                sb.append("<div class='class-section'>")
+                        .append("<h3>").append(section).append(": ").append(escapeHtml(clazz.getName())).append("</h3>")
+                        .append("<pre>").append(escapeHtml(generateClassInfo(clazz))).append("</pre>")
+                        .append("</div>");
             }
         }
 
-        for (Class<?> interfaceClass : interfaces) {
-            sb.append("<div class='class-section'>")
-                    .append("<h3>Interface: ").append(escapeHtml(interfaceClass.getName())).append("</h3>");
-            StringBuilder classInfo = new StringBuilder();
-            appendInterfaceInfo(interfaceClass, classInfo);
-            sb.append("<pre>").append(escapeHtml(classInfo.toString())).append("</pre>");
-            sb.append("</div>");
-        }
-
-        sb.append("<h2>Enums:</h2>");
-        for (Class<?> enumClass : enums) {
-            sb.append("<div class='class-section'>")
-                    .append("<h3>Enum: ").append(escapeHtml(enumClass.getName())).append("</h3>");
-            StringBuilder classInfo = new StringBuilder();
-            appendEnumInfo(enumClass, classInfo);
-            sb.append("<pre>").append(escapeHtml(classInfo.toString())).append("</pre>");
-            sb.append("</div>");
-        }
-
-        sb.append("<h2>Classes:</h2>");
-        for (Class<?> clazz : classes) {
-            sb.append("<div class='class-section'>")
-                    .append("<h3>Class: ").append(escapeHtml(clazz.getName())).append("</h3>");
-            StringBuilder classInfo = new StringBuilder();
-            readClassAndMembersInfo(clazz, classInfo);
-            sb.append("<pre>").append(escapeHtml(classInfo.toString())).append("</pre>");
-            sb.append("</div>");
-        }
         sb.append("</body></html>");
         return sb.toString();
     }
 
-    public static void readClassAndMembersInfo(Class<?> clazz, StringBuilder classAndMembersInfo) {
-        appendClassInfo(clazz, classAndMembersInfo);
+    private static Map<String, List<Class<?>>> categorizeClasses(List<Class<?>> classes) {
+        Map<String, List<Class<?>>> categorizedClasses = new HashMap<>();
+        categorizedClasses.put("Interface", new ArrayList<>());
+        categorizedClasses.put("Enum", new ArrayList<>());
+        categorizedClasses.put("Class", new ArrayList<>());
+
+        for (Class<?> clazz : classes) {
+            if (clazz.isInterface()) { categorizedClasses.get("Interface").add(clazz); }
+            else if (clazz.isEnum()) { categorizedClasses.get("Enum").add(clazz); }
+            else { categorizedClasses.get("Class").add(clazz); }
+        }
+        return categorizedClasses;
     }
 
-    private static void appendClassInfo(Class<?> clazz, StringBuilder classAndMembersInfo) {
-        classAndMembersInfo.append(Modifier.toString(clazz.getModifiers()))
+    private static String generateClassInfo(Class<?> clazz) {
+        StringBuilder info = new StringBuilder();
+        if (clazz.isEnum()) { appendEnumInfo(clazz, info); }
+        else {
+            appendClassInfo(clazz, info);
+            appendConstructors(clazz, info);
+            appendFields(clazz, info);
+            appendMethods(clazz, info);
+        }
+        return info.toString();
+    }
+
+    private static void appendClassInfo(Class<?> clazz, StringBuilder info) {
+        info.append(Modifier.toString(clazz.getModifiers()))
                 .append(" class ")
-                .append(clazz.getSimpleName());
+                .append(clazz.getSimpleName()).append(getInterfaces(clazz))
+                .append(System.lineSeparator()).append(System.lineSeparator());
+    }
 
+    private static void appendEnumInfo(Class<?> clazz, StringBuilder info) {
+        info.append(Modifier.toString(clazz.getModifiers()))
+                .append(" enum ").append(clazz.getSimpleName())
+                .append(System.lineSeparator()).append(System.lineSeparator());
+
+        Object[] constants = clazz.getEnumConstants();
+        if (constants != null) {
+            for (Object constant : constants) {
+                info.append("   ").append(((Enum<?>) constant).name()).append(System.lineSeparator());
+            }
+        }
+        info.append(System.lineSeparator());
+        appendMethods(clazz, info);
+    }
+
+    private static String getInterfaces(Class<?> clazz) {
         if (clazz.getInterfaces().length > 0) {
-            classAndMembersInfo.append(" implements ");
-            for (Class<?> intf : clazz.getInterfaces()) {
-                classAndMembersInfo.append(intf.getSimpleName()).append(", ");
+            return " implements " + Arrays.stream(clazz.getInterfaces())
+                    .map(Class::getSimpleName)
+                    .collect(Collectors.joining(", "));
+        }
+        return "";
+    }
+
+    private static void appendConstructors(Class<?> clazz, StringBuilder info) {
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        if (constructors.length > 0) {
+            for (Constructor<?> constructor : constructors) {
+                info.append("   ").append(Modifier.toString(constructor.getModifiers()))
+                        .append(" ").append(clazz.getSimpleName())
+                        .append(getParameters(constructor.getParameters()))
+                        .append(";").append(System.lineSeparator());
             }
-            classAndMembersInfo.delete(classAndMembersInfo.length() - 2, classAndMembersInfo.length());
-        }
-        classAndMembersInfo.append(System.lineSeparator());
-        appendConstructors(clazz, classAndMembersInfo);
-        appendFields(clazz, classAndMembersInfo);
-        appendMethods(clazz, classAndMembersInfo);
+            info.append(System.lineSeparator());
+        } else { info.append(""); }
     }
 
-    private static void appendInterfaceInfo(Class<?> interfaceClass, StringBuilder classInfo) {
-        classInfo.append(Modifier.toString(interfaceClass.getModifiers()))
-                .append(" interface ")
-                .append(interfaceClass.getSimpleName())
-                .append(System.lineSeparator())
-                .append(System.lineSeparator());
-
-        for (Method method : interfaceClass.getDeclaredMethods()) {
-            if (!Modifier.isPrivate(method.getModifiers())) {
-                classInfo.append("   ").append(Modifier.toString(method.getModifiers()))
-                        .append(" ").append(method.getReturnType().getSimpleName())
-                        .append(" ").append(method.getName());
-                appendParameters(method, classInfo);
-                classInfo.append(";").append(System.lineSeparator());
+    private static void appendFields(Class<?> clazz, StringBuilder info) {
+        Field[] fields = clazz.getDeclaredFields();
+        if (fields.length > 0) {
+            for (Field field : fields) {
+                if (field.getName().equals("$VALUES")) { continue; }
+                info.append("   ").append(Modifier.toString(field.getModifiers()))
+                        .append(" ").append(field.getType().getSimpleName())
+                        .append(" ").append(field.getName())
+                        .append(";").append(System.lineSeparator());
             }
-        }
+            info.append(System.lineSeparator());
+        } else { info.append(""); }
     }
 
-    private static void appendEnumInfo(Class<?> enumClass, StringBuilder classInfo) {
-        classInfo.append(Modifier.toString(enumClass.getModifiers()))
-                .append(" enum ")
-                .append(enumClass.getSimpleName())
-                .append(System.lineSeparator())
-                .append(System.lineSeparator());
-
-        Enum<?>[] enumConstants = (Enum<?>[]) enumClass.getEnumConstants();
-        for (Enum<?> constant : enumConstants) {
-            classInfo.append("   ").append(constant.name()).append(System.lineSeparator());
-        }
-        appendMethods(enumClass, classInfo);
-    }
-
-    private static void appendMethods(Class<?> clazz, StringBuilder classInfo) {
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (isValidMethod(method)) {
-                classInfo.append(System.lineSeparator())
-                        .append("   ").append(Modifier.toString(method.getModifiers()))
-                        .append(" ").append(method.getReturnType().getSimpleName())
-                        .append(" ").append(method.getName());
-                appendParameters(method, classInfo);
-                classInfo.append(";");
-            }
-        }
-    }
-
-    private static void appendConstructors(Class<?> clazz, StringBuilder classInfo) {
-        for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
-            classInfo.append(System.lineSeparator())
-                    .append("   ").append(Modifier.toString(constructor.getModifiers()))
-                    .append(" ").append(clazz.getSimpleName());
-            appendParameters(constructor, classInfo);
-            classInfo.append(";").append(System.lineSeparator());
-        }
-        classInfo.append(System.lineSeparator());
-    }
-
-    private static void appendParameters(Executable executable, StringBuilder classInfo) {
-        Parameter[] parameters = executable.getParameters();
-        classInfo.append("(");
-        if (parameters.length > 0) {
-            for (int i = 0; i < parameters.length; i++) {
-                classInfo.append(parameters[i].getType().getSimpleName())
-                        .append(" ").append(parameters[i].getName());
-                if (i < parameters.length - 1) {
-                    classInfo.append(", ");
+    private static void appendMethods(Class<?> clazz, StringBuilder info) {
+        Method[] methods = clazz.getDeclaredMethods();
+        if (methods.length > 0) {
+            for (Method method : methods) {
+                if (isValidMethod(method)) {
+                    info.append("   ").append(Modifier.toString(method.getModifiers()))
+                            .append(" ").append(method.getReturnType().getSimpleName())
+                            .append(" ").append(method.getName())
+                            .append(getParameters(method.getParameters()))
+                            .append(";").append(System.lineSeparator());
                 }
             }
-        }
-        classInfo.append(")");
+        } else { info.append(""); }
     }
 
     private static boolean isValidMethod(Method method) {
         return !method.isSynthetic() && !method.getName().startsWith("$");
     }
 
-    private static void appendFields(Class<?> clazz, StringBuilder classInfo) {
-        for (Field field : clazz.getDeclaredFields()) {
-            classInfo.append("   ").append(Modifier.toString(field.getModifiers()))
-                    .append(" ").append(field.getType().getSimpleName())
-                    .append(" ").append(field.getName()).append(";")
-                    .append(System.lineSeparator());
-        }
+    private static String getParameters(Parameter[] parameters) {
+        return Arrays.stream(parameters)
+                .map(param -> param.getType().getSimpleName() + " " + param.getName())
+                .collect(Collectors.joining(", ", "(", ")"));
     }
 
     private static String escapeHtml(String input) {
-        return input.replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("&", "&amp;")
-                .replace("\"", "&quot;");
+        return input.replace("<", "&lt;").replace(">", "&gt;")
+                .replace("&", "&amp;").replace("\"", "&quot;");
     }
 }
