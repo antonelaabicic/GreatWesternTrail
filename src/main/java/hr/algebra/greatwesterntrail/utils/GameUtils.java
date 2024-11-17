@@ -6,12 +6,16 @@ import hr.algebra.greatwesterntrail.repository.TileRepository;
 import javafx.scene.control.Alert;
 import javafx.scene.input.KeyEvent;
 
-public class GameUtils {
+public final class GameUtils {
+    private static boolean hasMovedThisTurn = false;
+
     private GameUtils() { }
 
     public static void handleKeyboardNavigation(KeyEvent event, Player player, TileButton[][] tileButtons) {
-        int newRow = player.getPlayerPosition().getRow();
-        int newCol = player.getPlayerPosition().getColumn();
+        int currentRow = player.getPlayerPosition().getRow();
+        int currentCol = player.getPlayerPosition().getColumn();
+        int newRow = currentRow;
+        int newCol = currentCol;
 
         switch (event.getCode()) {
             case UP -> newRow--;
@@ -19,16 +23,19 @@ public class GameUtils {
             case LEFT -> newCol--;
             case RIGHT -> newCol++;
             case ENTER -> {
-                TileButton currentTileButton = tileButtons[player.getPlayerPosition().getRow()][player.getPlayerPosition().getColumn()];
+                TileButton currentTileButton = tileButtons[currentRow][currentCol];
                 currentTileButton.performAction();
+                hasMovedThisTurn = false;
                 return;
             }
             default -> { return; }
         }
 
+        if (hasMovedThisTurn) { return; }
         if (isValidPosition(newRow, newCol)) {
             player.setPlayerPosition(newRow, newCol);
             TileUtils.highlightCurrentTile(player.getPlayerPosition(), tileButtons);
+            hasMovedThisTurn = true;
         } else {
             DialogUtils.showDialog("Out of Bounds", "You cannot move outside the board!", Alert.AlertType.WARNING);
         }

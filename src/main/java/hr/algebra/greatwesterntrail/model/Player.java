@@ -5,13 +5,14 @@ import hr.algebra.greatwesterntrail.utils.TrainProgressUtils;
 import lombok.Data;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
 
 @Data
-public class Player {
+public class Player implements Serializable {
     private Position playerPosition;
     private int vp = 0;
     private int money = 75;

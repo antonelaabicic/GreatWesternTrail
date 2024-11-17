@@ -110,4 +110,8 @@ public enum TileRepository {
     private ObjectiveAction randomObjective(List<ObjectiveAction> actions) {
         return actions.get(random.nextInt(actions.size()));
     }
+
+    public void resetTiles() {
+        initializeTiles();
+    }
 }

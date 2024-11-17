@@ -6,7 +6,7 @@ import hr.algebra.greatwesterntrail.model.Tile;
 import hr.algebra.greatwesterntrail.repository.TileRepository;
 import javafx.scene.control.Alert;
 
-public class GameStateUtils {
+public final class GameStateUtils {
     private GameStateUtils() { }
 
     public static void showWinnerDialog(Player player) {

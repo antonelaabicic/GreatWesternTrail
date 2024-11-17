@@ -10,7 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-public class TileUtils {
+public final class TileUtils {
     private TileUtils() { }
 
     public static StackPane createTileStack(Tile tile, Player player, BoardController boardController) {

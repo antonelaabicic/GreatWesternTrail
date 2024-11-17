@@ -5,7 +5,7 @@ import hr.algebra.greatwesterntrail.model.Player;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
-public class UIUtils {
+public final class UIUtils {
     private UIUtils() { }
 
     public static void disableGameScreen(BoardController boardController, Player player) {

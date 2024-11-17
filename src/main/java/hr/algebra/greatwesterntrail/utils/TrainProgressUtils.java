@@ -2,7 +2,7 @@ package hr.algebra.greatwesterntrail.utils;
 
 import hr.algebra.greatwesterntrail.model.VerticalProgressBar;
 
-public class TrainProgressUtils {
+public final class TrainProgressUtils {
 
     private TrainProgressUtils() { }
 

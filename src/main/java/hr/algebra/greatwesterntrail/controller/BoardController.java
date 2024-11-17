@@ -13,8 +13,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
-import java.util.Arrays;
-
 public class BoardController {
 
     @FXML
@@ -103,6 +101,9 @@ public class BoardController {
     }
 
     public void startNewGame(ActionEvent actionEvent) {
+        tileRepository.resetTiles();
+        initialize();
+        DialogUtils.showDialog("New game", "A new game has started!", Alert.AlertType.INFORMATION);
     }
 
     public void saveGame(ActionEvent actionEvent) {
@@ -112,5 +113,6 @@ public class BoardController {
     }
 
     public void generateDocumentation(ActionEvent actionEvent) {
+        DocumentationUtils.generateDocumentation();
     }
 }
