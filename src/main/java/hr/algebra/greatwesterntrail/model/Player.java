@@ -5,6 +5,7 @@ import hr.algebra.greatwesterntrail.utils.TrainProgressUtils;
 import lombok.Data;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
@@ -13,6 +14,9 @@ import java.util.function.Consumer;
 
 @Data
 public class Player implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1002L;
+
     private Position playerPosition;
     private int vp = 0;
     private int money = 75;
@@ -33,9 +37,9 @@ public class Player implements Serializable {
     private double trainProgress = 0;
 
     @Setter
-    private Consumer<Player> onTrainProgressMaxReached;
+    private transient Consumer<Player> onTrainProgressMaxReached;
     @Setter
-    private Consumer<Player> onGameOver;
+    private transient Consumer<Player> onGameOver;
 
     public Player() {
         this.initialCowDeck = initializeDeck(CowType.class);

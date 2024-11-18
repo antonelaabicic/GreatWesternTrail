@@ -24,8 +24,8 @@ public class BoardController {
     public VerticalProgressBar pbTrain;
 
     private TileRepository tileRepository;
-    private TileButton[][] tileButtons = new TileButton[TileRepository.GRID_SIZE][TileRepository.GRID_SIZE];
-    private Player player;
+    public TileButton[][] tileButtons = new TileButton[TileRepository.GRID_SIZE][TileRepository.GRID_SIZE];
+    public Player player;
 
     public void initialize() {
         player = new Player();
@@ -107,12 +107,38 @@ public class BoardController {
     }
 
     public void saveGame(ActionEvent actionEvent) {
+        GameStateUtils.saveGame(player, tileRepository.getTiles());
     }
 
+//    private void saveGamee() {
+//        try {
+//            GameState gameState = new GameState(player, tileRepository.getTiles());
+//            SerializationUtils.write(gameState, "game/savedGame.dat");
+//            DialogUtils.showDialog("Game saved", "Game state successfully saved!", Alert.AlertType.INFORMATION);
+//        } catch (IOException e) {
+//            DialogUtils.showDialog("Error", "Failed to save game state.", Alert.AlertType.ERROR);
+//            e.printStackTrace();
+//        }
+//    }
+
     public void loadGame(ActionEvent actionEvent) {
+        GameStateUtils.loadGame(this);
     }
 
     public void generateDocumentation(ActionEvent actionEvent) {
-        DocumentationUtils.generateDocumentation();
+        try {
+            DocumentationUtils.generateDocumentation();
+            DialogUtils.showDialog(
+                    "Documentation",
+                    "HTML documentation successfully generated!",
+                    Alert.AlertType.INFORMATION
+            );
+        } catch (RuntimeException e) {
+            DialogUtils.showDialog(
+                    "Error",
+                    "Something went wrong while generating documentation.",
+                    Alert.AlertType.ERROR
+            );
+        }
     }
 }

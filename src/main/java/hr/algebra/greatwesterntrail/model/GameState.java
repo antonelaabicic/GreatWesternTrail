@@ -8,10 +8,9 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-public class Position implements Serializable {
+public class GameState implements Serializable {
     @Serial
-    private static final long serialVersionUID = 1004L;
-
-    private int row;
-    private int column;
+    private static final long serialVersionUID = 1001L;
+    private final Player player;
+    private final Tile[][] tiles;
 }

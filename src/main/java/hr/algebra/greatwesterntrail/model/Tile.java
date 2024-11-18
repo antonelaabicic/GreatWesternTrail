@@ -7,13 +7,19 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Data
-public class Tile {
+public class Tile implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1003L;
+
     private TileType tileType;
     private BuildingType buildingType;
     private HazardType hazardType;
     private Objective objective;
-    private StackPane icons;
+    private transient StackPane icons;
 
     public Tile(BuildingType buildingType, Objective objective) {
         this.tileType = TileType.BUILDING;
@@ -41,6 +47,9 @@ public class Tile {
     }
 
     private void setupIcons() {
+        if (icons == null) {
+            icons = new StackPane();
+        }
         icons.getChildren().clear();
         ImageView icon = null;
 
