@@ -110,17 +110,6 @@ public class BoardController {
         GameStateUtils.saveGame(player, tileRepository.getTiles());
     }
 
-//    private void saveGamee() {
-//        try {
-//            GameState gameState = new GameState(player, tileRepository.getTiles());
-//            SerializationUtils.write(gameState, "game/savedGame.dat");
-//            DialogUtils.showDialog("Game saved", "Game state successfully saved!", Alert.AlertType.INFORMATION);
-//        } catch (IOException e) {
-//            DialogUtils.showDialog("Error", "Failed to save game state.", Alert.AlertType.ERROR);
-//            e.printStackTrace();
-//        }
-//    }
-
     public void loadGame(ActionEvent actionEvent) {
         GameStateUtils.loadGame(this);
     }
