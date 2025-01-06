@@ -1,8 +1,11 @@
 package hr.algebra.greatwesterntrail.controller;
 
+import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
 import hr.algebra.greatwesterntrail.model.Player;
+import hr.algebra.greatwesterntrail.model.PlayerMode;
 import hr.algebra.greatwesterntrail.model.WorkerType;
 import hr.algebra.greatwesterntrail.utils.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -45,6 +48,17 @@ public class HiringCenterPopupController {
         updateSellingTextFields();
         updateTotalCost();
         player.setOnTrainProgressMaxReached(GameStateUtils::showWinnerDialog);
+
+        //
+        Platform.runLater(() -> {
+            Stage stage = (Stage) btnConfirm.getScene().getWindow();
+            stage.setOnCloseRequest(event -> {
+                if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
+                    UIUtils.disableGameScreen(boardController);
+                    NetworkingUtils.sendGameState(boardController.gameState);
+                }
+            });
+        });
     }
 
     private void initializeTextFieldMaps() {
@@ -57,14 +71,14 @@ public class HiringCenterPopupController {
         Map<WorkerType, Integer> fireQuantities = getWorkerQuantities(fireTextFieldMap);
 
         if (!canHireWorkers(fireQuantities)) {
-            DialogUtils.showDialog("Invalid hiring", "You cannot fire more workers than you currently have.", Alert.AlertType.WARNING);
+            DialogUtils.showDialogAndDisable("Invalid hiring", "You cannot fire more workers than you currently have.", Alert.AlertType.WARNING);
             resetTextFields();
             return;
         }
 
         int totalCostValue = PopupUtils.calculateTransactionCost(hireQuantities, fireQuantities);
         if (totalCostValue > player.getMoney()) {
-            DialogUtils.showDialog("Insufficient funds", "You don't have enough money to complete the purchase.", Alert.AlertType.WARNING);
+            DialogUtils.showDialogAndDisable("Insufficient funds", "You don't have enough money to complete the purchase.", Alert.AlertType.WARNING);
             resetTextFields();
             return;
         }
@@ -73,15 +87,24 @@ public class HiringCenterPopupController {
         updateWorkerDeck(hireQuantities, fireQuantities);
         int additionalEngineerCount = player.getWorkerDeck().getOrDefault(WorkerType.ENGINEER, 0) ;
         player.incrementTrainProgress(additionalEngineerCount - firstEngineerCount);
-        TrainProgressUtils.updateTrainProgressBar(boardController.pbTrain, player.getTrainProgress());
+        TrainProgressUtils.updateTrainProgressBar(
+                GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE ?
+                boardController.pbTrain1 : boardController.pbTrain2,
+                player.getTrainProgress());
 
         player.setMoney(player.getMoney() - totalCostValue);
         int earnedVP = PopupUtils.calculateVPs(hireQuantities, fireQuantities);;
         player.setVp(player.getVp() + earnedVP);
 
-        DialogUtils.showDialog("Transaction complete",
+        DialogUtils.showDialogAndDisable("Transaction complete",
                 "You earned " + earnedVP + " VPs from this transaction! Your budget is currently " + player.getMoney() + "$.",
                 Alert.AlertType.INFORMATION);
+
+        if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
+            UIUtils.disableGameScreen(boardController);
+            //boardController.gameState.nextTurn();
+            NetworkingUtils.sendGameState(boardController.gameState);
+        }
         ((Stage) btnConfirm.getScene().getWindow()).close();
     }
 

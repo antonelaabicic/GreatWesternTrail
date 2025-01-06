@@ -65,7 +65,8 @@ public class TileButton extends Button {
                 "view/emptyTilePopup.fxml",
                 "Empty Tile",
                 player,
-                this);
+                this,
+                boardController);
     }
 
     private void handleHazardDialog(String hazardName) {
@@ -86,20 +87,20 @@ public class TileButton extends Button {
                 tile.setHazardType(null);
                 tile.setIcons();
                 setGraphic(tile.getIcons());
-                DialogUtils.showDialog(
+                DialogUtils.showDialogAndDisable(
                         "Hazard Removed",
-                        "You've gained " + REMOVE_HAZARD_VP + " VPs. The hazard has been removed.",
+                        GreatWesternTrailApplication.playerMode.name() + " has gained " + REMOVE_HAZARD_VP + " VPs. The hazard has been removed.",
                         Alert.AlertType.INFORMATION);
             } else {
-                DialogUtils.showDialog(
+                DialogUtils.showDialogAndDisable(
                         "Hazard Crossed",
-                        "You've paid " + CROSS_HAZARD_COST + "$.",
+                        GreatWesternTrailApplication.playerMode.name() + " has paid " + CROSS_HAZARD_COST + "$.",
                         Alert.AlertType.INFORMATION);
             }
         } else {
-            DialogUtils.showDialog(
+            DialogUtils.showDialogAndDisable(
                     "Insufficient Funds",
-                    "You do not have enough money to " + (removeHazard ? "remove" : "cross") + " the hazard.",
+                    GreatWesternTrailApplication.playerMode.name() + " doesn't have enough money to " + (removeHazard ? "remove" : "cross") + " the hazard.",
                     Alert.AlertType.ERROR);
         }
     }
@@ -109,10 +110,12 @@ public class TileButton extends Button {
         int steps = 1 + random.nextInt(5);
         player.incrementTrainProgress(steps);
         player.setTrainProgress(player.getTrainProgress());
-        TrainProgressUtils.updateTrainProgressBar(boardController.pbTrain, player.getTrainProgress());
-        DialogUtils.showDialog(
+        TrainProgressUtils.updateTrainProgressBar(
+                GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE ?
+                boardController.pbTrain1 : boardController.pbTrain2, player.getTrainProgress());
+        DialogUtils.showDialogAndDisable(
                 "Success",
-                "You've moved " + steps + " on the train track!",
+                GreatWesternTrailApplication.playerMode.name() + " has moved " + steps + " on the train track!",
                 Alert.AlertType.INFORMATION);
     }
 
@@ -128,6 +131,7 @@ public class TileButton extends Button {
         SceneUtils.loadScene(GreatWesternTrailApplication.class,
                 "view/cowExchangePopup.fxml",
                 "Cow Exchange",
-                player);
+                player,
+                boardController);
     }
 }

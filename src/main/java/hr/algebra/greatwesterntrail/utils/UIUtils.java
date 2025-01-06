@@ -8,7 +8,7 @@ import javafx.scene.control.Alert;
 public final class UIUtils {
     private UIUtils() { }
 
-    public static void disableGameScreen(BoardController boardController, Player player) {
+    public static void disableGameScreenAtEnd(BoardController boardController, Player player) {
         Platform.runLater(() -> {
             boardController.boardGrid.setDisable(true);
             boardController.btnPoints.setDisable(true);
@@ -17,10 +17,22 @@ public final class UIUtils {
             boardController.btnDeck.setDisable(true);
 
             if (player.getVp() > 99) {
-                DialogUtils.showDialog("Game Over", "You have won!", Alert.AlertType.INFORMATION);
+                DialogUtils.showDialogAndDisable("Game Over", "You have won!", Alert.AlertType.INFORMATION);
             } else {
-                DialogUtils.showDialog("Game Over", "You have lost!", Alert.AlertType.INFORMATION);
+                DialogUtils.showDialogAndDisable("Game Over", "You have lost!", Alert.AlertType.INFORMATION);
             }
+        });
+    }
+
+    public static void disableGameScreen(BoardController boardController) {
+        Platform.runLater(() -> {
+            boardController.boardGrid.setDisable(true);
+            boardController.btnPoints.setDisable(true);
+            boardController.btnMoney.setDisable(true);
+            boardController.btnWorkers.setDisable(true);
+            boardController.btnDeck.setDisable(true);
+
+            boardController.boardGrid.requestFocus();
         });
     }
 
@@ -31,6 +43,8 @@ public final class UIUtils {
             boardController.btnMoney.setDisable(false);
             boardController.btnWorkers.setDisable(false);
             boardController.btnDeck.setDisable(false);
+
+            boardController.boardGrid.requestFocus();
         });
     }
 }

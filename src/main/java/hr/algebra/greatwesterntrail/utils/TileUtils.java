@@ -1,10 +1,8 @@
 package hr.algebra.greatwesterntrail.utils;
 
+import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
 import hr.algebra.greatwesterntrail.controller.BoardController;
-import hr.algebra.greatwesterntrail.model.Player;
-import hr.algebra.greatwesterntrail.model.Position;
-import hr.algebra.greatwesterntrail.model.Tile;
-import hr.algebra.greatwesterntrail.model.TileButton;
+import hr.algebra.greatwesterntrail.model.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -20,45 +18,86 @@ public final class TileUtils {
         StackPane tileStack = new StackPane();
         tileStack.getChildren().add(tileButton);
 
-        DropShadow dropShadow = new DropShadow();
-        dropShadow.setRadius(10);
-        dropShadow.setOffsetX(0);
-        dropShadow.setOffsetY(0);
-        dropShadow.setColor(Color.BLACK);
-
-        Circle highlightCircle = new Circle(20, Color.RED);
-        highlightCircle.setEffect(dropShadow);
-        highlightCircle.setVisible(false);
-        tileStack.getChildren().add(highlightCircle);
+        if (GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
+            Circle circlePlayerOne = buildHighlightCircle(Color.RED);
+            tileStack.getChildren().add(circlePlayerOne);
+        } else {
+            Circle circlePlayerOne = buildHighlightCircle(Color.RED);
+            circlePlayerOne.setTranslateX(-15);
+            tileStack.getChildren().add(circlePlayerOne);
+            Circle circlePlayerTwo = buildHighlightCircle(Color.BLUE);
+            circlePlayerTwo.setTranslateX(15);
+            tileStack.getChildren().add(circlePlayerTwo);
+        }
 
         return tileStack;
     }
 
-    private static void clearAllHighlights(TileButton[][] tileButtons) {
+    private static Circle buildHighlightCircle(Color color) {
+        Circle circle = new Circle(10, color);
+
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setRadius(7);
+        dropShadow.setOffsetX(0);
+        dropShadow.setOffsetY(0);
+        dropShadow.setColor(Color.BLACK);
+
+        circle.setEffect(dropShadow);
+        circle.setVisible(false);
+        return circle;
+    }
+
+    public static void clearAllHighlights(TileButton[][] tileButtons) {
         for (TileButton[] row : tileButtons) {
             for (TileButton tileButton : row) {
-                StackPane tileStack = (StackPane) tileButton.getParent();
-                Circle circle = (Circle) tileStack.getChildren().get(1);
-                circle.setVisible(false);
+                if (tileButton != null && tileButton.getParent() instanceof StackPane stack) {
+                    if (stack.getChildren().size() > 1) {
+                        stack.getChildren().get(1).setVisible(false);
+                    }
+                    if (stack.getChildren().size() > 2) {
+                        stack.getChildren().get(2).setVisible(false);
+                    }
+                }
             }
         }
     }
 
-    private static void setHighlightVisible(TileButton tileButton) {
-        if (tileButton != null) {
-            StackPane tileStack = (StackPane) tileButton.getParent();
-            Circle circle = (Circle) tileStack.getChildren().get(1);
-            circle.setVisible(true);
+    private static void showCircle(TileButton tileButton, int circleIndex) {
+        if (tileButton != null && tileButton.getParent() instanceof StackPane stack) {
+            if (stack.getChildren().size() > circleIndex) {
+                stack.getChildren().get(circleIndex).setVisible(true);
+            }
         }
     }
 
-    public static void highlightCurrentTile(Position playerPosition, TileButton[][] tileButtons) {
+    public static void highlightSinglePlayer(Position playerPosition, TileButton[][] tileButtons) {
         clearAllHighlights(tileButtons);
+
+        if (playerPosition == null) return;
 
         int row = playerPosition.getRow();
         int col = playerPosition.getColumn();
         TileButton currentTile = tileButtons[row][col];
+        if (currentTile != null) {
+            showCircle(currentTile, 1);
+        }
+    }
 
-        setHighlightVisible(currentTile);
+    public static void highlightTwoPlayers(Player playerOne, Player playerTwo, TileButton[][] tileButtons) {
+        clearAllHighlights(tileButtons);
+
+        if (playerOne != null && playerOne.getPlayerPosition() != null) {
+            int row = playerOne.getPlayerPosition().getRow();
+            int col = playerOne.getPlayerPosition().getColumn();
+            TileButton tileBtn = tileButtons[row][col];
+            showCircle(tileBtn, 1);
+        }
+
+        if (playerTwo != null && playerTwo.getPlayerPosition() != null) {
+            int row = playerTwo.getPlayerPosition().getRow();
+            int col = playerTwo.getPlayerPosition().getColumn();
+            TileButton tileBtn = tileButtons[row][col];
+            showCircle(tileBtn, 2);
+        }
     }
 }

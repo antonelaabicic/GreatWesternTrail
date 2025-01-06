@@ -34,10 +34,10 @@ public final class GameUtils {
         if (hasMovedThisTurn) { return; }
         if (isValidPosition(newRow, newCol)) {
             player.setPlayerPosition(newRow, newCol);
-            TileUtils.highlightCurrentTile(player.getPlayerPosition(), tileButtons);
+            TileUtils.highlightSinglePlayer(player.getPlayerPosition(), tileButtons);
             hasMovedThisTurn = true;
         } else {
-            DialogUtils.showDialog("Out of Bounds", "You cannot move outside the board!", Alert.AlertType.WARNING);
+            DialogUtils.showDialogAndDisable("Out of Bounds", "You cannot move outside the board!", Alert.AlertType.WARNING);
         }
     }
 

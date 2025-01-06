@@ -1,10 +1,15 @@
 package hr.algebra.greatwesterntrail.controller;
 
+import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
 import hr.algebra.greatwesterntrail.model.CowType;
 import hr.algebra.greatwesterntrail.model.Player;
+import hr.algebra.greatwesterntrail.model.PlayerMode;
 import hr.algebra.greatwesterntrail.model.WorkerType;
 import hr.algebra.greatwesterntrail.utils.DialogUtils;
+import hr.algebra.greatwesterntrail.utils.NetworkingUtils;
 import hr.algebra.greatwesterntrail.utils.PopupUtils;
+import hr.algebra.greatwesterntrail.utils.UIUtils;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -24,11 +29,13 @@ public class CowExchangePopupController {
     public Button btnConfirm;
 
     private Player player;
+    private BoardController boardController;
     private Map<CowType, TextField> buyTextFieldMap = new EnumMap<>(CowType.class);
     private Map<CowType, TextField> sellTextFieldMap = new EnumMap<>(CowType.class);
 
-    public void initialize(Player player) {
+    public void initialize(Player player, BoardController boardController) {
         this.player = player;
+        this.boardController = boardController;
         initializeTextFieldMaps();
 
         PopupUtils.setInputValidation(
@@ -45,6 +52,18 @@ public class CowExchangePopupController {
 
         updateSellingTextFields();
         updateTotalCost();
+
+        //
+        Platform.runLater(() -> {
+            Stage stage = (Stage) btnConfirm.getScene().getWindow();
+            stage.setOnCloseRequest(event -> {
+                if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
+                    UIUtils.disableGameScreen(boardController);
+                    //boardController.gameState.nextTurn();
+                    NetworkingUtils.sendGameState(boardController.gameState);
+                }
+            });
+        });
     }
 
     private void initializeTextFieldMaps() {
@@ -57,20 +76,20 @@ public class CowExchangePopupController {
         Map<CowType, Integer> sellQuantities = getCowQuantities(sellTextFieldMap);
 
         if (!canSellCows(sellQuantities)) {
-            DialogUtils.showDialog("Invalid sale", "You cannot sell more cows than you currently own.", Alert.AlertType.WARNING);
+            DialogUtils.showDialogAndDisable("Invalid sale", "You cannot sell more cows than you currently own.", Alert.AlertType.WARNING);
             resetTextFields();
             return;
         }
 
         if (!canBuyMultipleCows(buyQuantities)) {
-            DialogUtils.showDialog("Purchase limit", "With fewer than 5 cowboys, you can only buy one type of cow per transaction.", Alert.AlertType.WARNING);
+            DialogUtils.showDialogAndDisable("Purchase limit", "With fewer than 5 cowboys, you can only buy one type of cow per transaction.", Alert.AlertType.WARNING);
             resetTextFields();
             return;
         }
 
         int totalCostValue = PopupUtils.calculateTransactionCost(buyQuantities, sellQuantities);
         if (totalCostValue > player.getMoney()) {
-            DialogUtils.showDialog("Insufficient funds", "You don't have enough money to complete the purchase.", Alert.AlertType.WARNING);
+            DialogUtils.showDialogAndDisable("Insufficient funds", "You don't have enough money to complete the purchase.", Alert.AlertType.WARNING);
             resetTextFields();
             return;
         }
@@ -81,9 +100,16 @@ public class CowExchangePopupController {
         int earnedVP = PopupUtils.calculateVPs(buyQuantities, sellQuantities);
         player.setVp(player.getVp() + earnedVP);
 
-        DialogUtils.showDialog("Transaction complete",
+        DialogUtils.showDialogAndDisable("Transaction complete",
                 "You earned " + earnedVP + " VPs from this transaction! Your budget is currently " + player.getMoney() + "$.",
                 Alert.AlertType.INFORMATION);
+
+        if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
+            UIUtils.disableGameScreen(boardController);
+            //boardController.gameState.nextTurn();
+            NetworkingUtils.sendGameState(boardController.gameState);
+        }
+
         ((Stage) btnConfirm.getScene().getWindow()).close();
     }
 
@@ -110,7 +136,6 @@ public class CowExchangePopupController {
 
     private void updateCowDeck(Map<CowType, Integer> buyQuantities, Map<CowType, Integer> sellQuantities) {
         PopupUtils.updateDeck(player.getCowDeck(), buyQuantities, sellQuantities);
-        //
         buyQuantities.forEach((cowType, count) -> {
             int newCount = player.getCowDeck().getOrDefault(cowType, 0);
             player.updatePeakValues(cowType, newCount);

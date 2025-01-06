@@ -7,6 +7,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
@@ -14,8 +15,9 @@ public enum TileRepository {
     INSTANCE;
 
     public static final int GRID_SIZE = 5;
+    @Setter
     @Getter
-    private final Tile[][] tiles = new Tile[GRID_SIZE][GRID_SIZE];
+    private Tile[][] tiles = new Tile[GRID_SIZE][GRID_SIZE];
     private final Random random = new Random();
 
     TileRepository() {

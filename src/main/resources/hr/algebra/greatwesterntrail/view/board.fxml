@@ -64,9 +64,14 @@
             </GridPane>
             <VBox prefHeight="697.0" prefWidth="30.0">
                <children>
-                   <StackPane style="-fx-padding: 0 0 0 4;">
-                       <VerticalProgressBar fx:id="pbTrain" prefHeight="443.0" prefWidth="50.0" />
-                   </StackPane>
+                   <HBox>
+                       <StackPane style="-fx-padding: 0 0 0 4;">
+                           <VerticalProgressBar fx:id="pbTrain1" prefHeight="443.0" prefWidth="50.0" />
+                       </StackPane>
+                       <StackPane style="-fx-padding: 0 0 0 4;">
+                           <VerticalProgressBar fx:id="pbTrain2" prefHeight="443.0" prefWidth="50.0" />
+                       </StackPane>
+                   </HBox>
                    <ImageView fitHeight="121.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../images/train_icon.png" />
