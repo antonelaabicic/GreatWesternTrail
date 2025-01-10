@@ -3,6 +3,7 @@ package hr.algebra.greatwesterntrail;
 import hr.algebra.greatwesterntrail.controller.BoardController;
 import hr.algebra.greatwesterntrail.model.GameState;
 import hr.algebra.greatwesterntrail.model.PlayerMode;
+import hr.algebra.greatwesterntrail.utils.DialogUtils;
 import hr.algebra.greatwesterntrail.utils.GameStateUtils;
 import hr.algebra.greatwesterntrail.utils.SceneUtils;
 import hr.algebra.greatwesterntrail.utils.UIUtils;
@@ -76,7 +77,7 @@ public class GreatWesternTrailApplication extends Application {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.err.printf("Client connected from port %s%n", clientSocket.getPort());
-                new Thread(() ->  processSerializableClient(clientSocket)).start();
+                new Thread(() -> processSerializableClient(clientSocket)).start();
             }
         }  catch (IOException e) {
             e.printStackTrace();
@@ -93,6 +94,10 @@ public class GreatWesternTrailApplication extends Application {
                 GameStateUtils.applyLoadedGameState(receivedState);
                 BoardController.getInstance().gameState.nextTurn();
                 UIUtils.enableGameScreen(BoardController.getInstance());
+                if (receivedState.getDialogMessage() != null && !receivedState.getDialogMessage().isEmpty()) {
+                    DialogUtils.showDialog("Message from Opponent", receivedState.getDialogMessage(), Alert.AlertType.INFORMATION);
+                    receivedState.setDialogMessage(null);
+                }
 
                 // popravi
                 boolean isFinished = GameStateUtils.checkForWinner(receivedState);

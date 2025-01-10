@@ -16,14 +16,10 @@ public class GameState implements Serializable {
     private final Player playerTwo;
     private final Tile[][] tiles;
     private boolean isPlayerOneTurn;
+    private String dialogMessage; //
 
-    //
     public Player getCurrentPlayer() {
         return isPlayerOneTurn ? playerOne : playerTwo;
-    }
-
-    public Player getNotCurrentPlayer() {
-        return isPlayerOneTurn ? playerTwo : playerOne;
     }
 
     public void nextTurn() {

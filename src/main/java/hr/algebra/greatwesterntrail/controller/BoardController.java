@@ -67,7 +67,7 @@ public class BoardController {
         if (GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
             tileRepository = TileRepository.INSTANCE;
             Tile[][] tiles = tileRepository.getTiles();
-            this.gameState = new GameState(new Player(), null, tiles, true);
+            this.gameState = new GameState(new Player(), null, tiles, true, null);
             initializeBoard(gameState.getTiles());
         } else {
             GameState loadedState = GameStateUtils.loadGameFromFile();
@@ -78,7 +78,7 @@ public class BoardController {
                 tileRepository = TileRepository.INSTANCE;
                 Tile[][] tiles = tileRepository.getTiles();
                 this.gameState = new GameState(new Player(), new Player(), tiles,
-                        GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE); // <3
+                        GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE, null);
                 GameStateUtils.saveGameToFile(this.gameState);
                 GameStateUtils.applyLoadedGameState(this.gameState);
             }
@@ -153,14 +153,18 @@ public class BoardController {
     public void startNewGame(ActionEvent actionEvent) {
         if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
             tileRepository = TileRepository.INSTANCE;
-            this.gameState = new GameState(new Player(), new Player(), tileRepository.getTiles(), true);
+            this.gameState = new GameState(new Player(), new Player(), tileRepository.getTiles(), true, null);
             GameStateUtils.saveGameToFile(this.gameState);
             GameStateUtils.applyLoadedGameState(this.gameState);
-            NetworkingUtils.sendGameState(gameState);
+            NetworkingUtils.showDialogAndSendGameStateUpdate(
+                    "New game",
+                    GreatWesternTrailApplication.playerMode + " has started a new game."
+            );
+        } else {
+            tileRepository.resetTiles();
+            initialize();
+            DialogUtils.showDialogAndDisable("New game", "A new game has started!", Alert.AlertType.INFORMATION);
         }
-        tileRepository.resetTiles();
-        initialize();
-        DialogUtils.showDialogAndDisable("New game", "A new game has started!", Alert.AlertType.INFORMATION);
     }
 
     public void saveGame(ActionEvent actionEvent) { GameStateUtils.saveGame(gameState); }

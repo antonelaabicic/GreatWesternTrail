@@ -86,4 +86,8 @@ public final class PopupUtils {
         }
     }
 
+    public static <T> boolean areAllQuantitiesZero(Map<T, Integer> quantities) {
+        return quantities.values().stream().allMatch(quantity -> quantity == 0);
+    }
+
 }

@@ -36,7 +36,6 @@ public class EmptyTilePopupController {
         trainStationPane.setOnMouseClicked(event -> selectBuilding(BuildingType.TRAIN_STATION));
 
         btnConfirm.setOnAction(event -> confirm());
-        //
         Platform.runLater(() -> {
             Stage stage = (Stage) btnConfirm.getScene().getWindow();
             stage.setOnCloseRequest(event -> {
@@ -64,7 +63,7 @@ public class EmptyTilePopupController {
 
     private void confirm() {
         if (selectedBuilding == null) {
-            DialogUtils.showDialogAndDisable("No selection",
+            DialogUtils.showDialog("No selection",
                     "Please select a building to construct.",
                     Alert.AlertType.WARNING);
             return;
@@ -72,7 +71,7 @@ public class EmptyTilePopupController {
 
         int currentBuilders = player.getWorkerDeck().getOrDefault(WorkerType.BUILDER, 0);
         if (currentBuilders < REQUIRED_BUILDERS) {
-            DialogUtils.showDialogAndDisable(
+            DialogUtils.showDialog(
                     "Not enough builders",
                     "You do not have enough builders to construct any building. \nYou need at least "
                             + REQUIRED_BUILDERS + " builders.",
@@ -91,27 +90,22 @@ public class EmptyTilePopupController {
             tileButton.getTile().setIcons();
             tileButton.setGraphic(tileButton.getTile().getIcons());
 
-            DialogUtils.showDialogAndDisable(
-                    "Building constructed!",
-                    "You've constructed the " + selectedBuilding + " and earned " + selectedBuilding.getValue()
-                            + " VPs! \nYour budget is currently " + player.getMoney() + "$.",
-                    Alert.AlertType.INFORMATION
-            );
+            String buildingConstructedMessage = GreatWesternTrailApplication.playerMode + " has constructed the "
+                    + selectedBuilding + " and earned " + selectedBuilding.getValue() + " VPs!";
+            if (GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
+                DialogUtils.showDialogAndDisable("Building constructed!", buildingConstructedMessage, Alert.AlertType.INFORMATION);
+            } else {
+                NetworkingUtils.showDialogAndSendGameStateUpdate("Sale Success", buildingConstructedMessage);
+                UIUtils.disableGameScreen(boardController);
+            }
         } else {
             DialogUtils.showDialogAndDisable(
                     "Requirements not met",
-                    "You do not meet the requirements to construct " + selectedBuilding + ".",
+                    "You do not have enough money to construct " + selectedBuilding + ".",
                     Alert.AlertType.ERROR
             );
             deselectSelectedBuilding();
         }
-
-        if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
-            UIUtils.disableGameScreen(boardController);
-            //boardController.gameState.nextTurn();
-            NetworkingUtils.sendGameState(boardController.gameState);
-        }
-
         ((Stage) btnConfirm.getScene().getWindow()).close();
     }
 

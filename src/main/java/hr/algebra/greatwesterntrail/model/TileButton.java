@@ -70,6 +70,7 @@ public class TileButton extends Button {
     }
 
     private void handleHazardDialog(String hazardName) {
+        String formattedHazardName = hazardName.substring(0, 1).toUpperCase() + hazardName.substring(1);
         boolean removeHazard = DialogUtils.showConfirmDialog(
                 "Hazard Encountered!",
                 "Do you want to cross the " + hazardName + " hazard or remove it? " +
@@ -87,20 +88,20 @@ public class TileButton extends Button {
                 tile.setHazardType(null);
                 tile.setIcons();
                 setGraphic(tile.getIcons());
-                DialogUtils.showDialogAndDisable(
-                        "Hazard Removed",
-                        GreatWesternTrailApplication.playerMode.name() + " has gained " + REMOVE_HAZARD_VP + " VPs. The hazard has been removed.",
-                        Alert.AlertType.INFORMATION);
+
+                NetworkingUtils.showDialogAndSendGameStateUpdate("Success",
+                        GreatWesternTrailApplication.playerMode.name() + " has gained " + REMOVE_HAZARD_VP +
+                                " VPs. " + formattedHazardName + " hazard has been removed.");
+
             } else {
-                DialogUtils.showDialogAndDisable(
-                        "Hazard Crossed",
-                        GreatWesternTrailApplication.playerMode.name() + " has paid " + CROSS_HAZARD_COST + "$.",
-                        Alert.AlertType.INFORMATION);
+                NetworkingUtils.showDialogAndSendGameStateUpdate("Success",
+                        GreatWesternTrailApplication.playerMode.name() + " has paid " + CROSS_HAZARD_COST + "$. " +
+                                formattedHazardName + " hazard has been crossed.");
             }
         } else {
             DialogUtils.showDialogAndDisable(
                     "Insufficient Funds",
-                    GreatWesternTrailApplication.playerMode.name() + " doesn't have enough money to " + (removeHazard ? "remove" : "cross") + " the hazard.",
+                    GreatWesternTrailApplication.playerMode.name() + " doesn't have enough money to " + (removeHazard ? "remove" : "cross") + hazardName,
                     Alert.AlertType.ERROR);
         }
     }
@@ -113,10 +114,9 @@ public class TileButton extends Button {
         TrainProgressUtils.updateTrainProgressBar(
                 GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE ?
                 boardController.pbTrain1 : boardController.pbTrain2, player.getTrainProgress());
-        DialogUtils.showDialogAndDisable(
-                "Success",
-                GreatWesternTrailApplication.playerMode.name() + " has moved " + steps + " on the train track!",
-                Alert.AlertType.INFORMATION);
+
+        NetworkingUtils.showDialogAndSendGameStateUpdate("Success",
+                GreatWesternTrailApplication.playerMode.name() + " has moved " + steps + " on the train track!");
     }
 
     private void showHiringCenterDialog() {

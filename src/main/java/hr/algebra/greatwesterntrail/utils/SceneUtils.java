@@ -73,7 +73,6 @@ public final class SceneUtils {
                 }
             }
         }
-
         System.err.println("No matching initialize method found for controller: " + controller.getClass().getName());
     }
 }

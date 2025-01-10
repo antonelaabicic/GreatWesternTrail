@@ -59,7 +59,11 @@ public final class GameStateUtils {
     public static void saveGame(GameState gameState) {
         try {
             SerializationUtils.write(gameState, SAVE_GAME_FILE_NAME);
-            DialogUtils.showDialogAndDisable("Game saved", "Game state successfully saved!", Alert.AlertType.INFORMATION);
+            //DialogUtils.showDialogAndDisable("Game saved", "Game state successfully saved!", Alert.AlertType.INFORMATION);
+            NetworkingUtils.showDialogAndSendGameStateUpdate(
+                    "Save game",
+                    GreatWesternTrailApplication.playerMode + " has saved the current game."
+            );
         } catch (IOException e) {
             DialogUtils.showDialogAndDisable("Error", "Failed to save game state.", Alert.AlertType.ERROR);
             e.printStackTrace();
@@ -71,7 +75,11 @@ public final class GameStateUtils {
             GameState loadedState = SerializationUtils.read(SAVE_GAME_FILE_NAME);
             applyLoadedGameState(loadedState);
 
-            DialogUtils.showDialogAndDisable("Game loaded", "Game state successfully loaded!", Alert.AlertType.INFORMATION);
+            NetworkingUtils.showDialogAndSendGameStateUpdate(
+                    "Loaded game",
+                    GreatWesternTrailApplication.playerMode + " has loaded last saved game."
+            );
+            //DialogUtils.showDialogAndDisable("Game loaded", "Game state successfully loaded!", Alert.AlertType.INFORMATION);
         } catch (IOException | ClassNotFoundException e) {
             DialogUtils.showDialogAndDisable("Error", "Failed to load game state.", Alert.AlertType.ERROR);
             e.printStackTrace();
@@ -167,34 +175,4 @@ public final class GameStateUtils {
         }
         return false;
     }
-
-//    public static void loadGame(BoardController boardController) {
-//        try {
-//            GameState loadedState = SerializationUtils.read(SAVE_GAME_FILE_NAME);
-//            boardController.player1 = loadedState.getPlayerOne();
-//            boardController.player2 = loadedState.getPlayerTwo(); //
-//
-//            Tile[][] tiles = loadedState.getTiles();
-//            for (int row = 0; row < TileRepository.GRID_SIZE; row++) {
-//                for (int col = 0; col < TileRepository.GRID_SIZE; col++) {
-//                    Tile tile = tiles[row][col];
-//                    tile.setIcons();
-//                    StackPane tileStack = TileUtils.createTileStack(tile, boardController.player1, boardController);
-//                    boardController.boardGrid.add(tileStack, col, row);
-//
-//                    TileButton tileButton = (TileButton) tileStack.getChildren().getFirst();
-//                    boardController.tileButtons[row][col] = tileButton;
-//
-//                    if (boardController.player1.getPlayerPosition().getRow() == row && boardController.player1.getPlayerPosition().getColumn() == col) {
-//                        TileUtils.highlightCurrentTile(boardController.player1.getPlayerPosition(), boardController.tileButtons);
-//                    }
-//                }
-//            }
-//            TrainProgressUtils.updateTrainProgressBar(boardController.pbTrain1, boardController.player1.getTrainProgress());
-//            DialogUtils.showDialog("Game loaded", "Game state successfully loaded!", Alert.AlertType.INFORMATION);
-//        } catch (IOException | ClassNotFoundException e) {
-//            DialogUtils.showDialog("Error", "Failed to load game state.", Alert.AlertType.ERROR);
-//            e.printStackTrace();
-//        }
-//    }
 }

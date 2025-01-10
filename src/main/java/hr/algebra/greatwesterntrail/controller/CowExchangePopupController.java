@@ -1,10 +1,7 @@
 package hr.algebra.greatwesterntrail.controller;
 
 import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
-import hr.algebra.greatwesterntrail.model.CowType;
-import hr.algebra.greatwesterntrail.model.Player;
-import hr.algebra.greatwesterntrail.model.PlayerMode;
-import hr.algebra.greatwesterntrail.model.WorkerType;
+import hr.algebra.greatwesterntrail.model.*;
 import hr.algebra.greatwesterntrail.utils.DialogUtils;
 import hr.algebra.greatwesterntrail.utils.NetworkingUtils;
 import hr.algebra.greatwesterntrail.utils.PopupUtils;
@@ -53,13 +50,11 @@ public class CowExchangePopupController {
         updateSellingTextFields();
         updateTotalCost();
 
-        //
         Platform.runLater(() -> {
             Stage stage = (Stage) btnConfirm.getScene().getWindow();
             stage.setOnCloseRequest(event -> {
                 if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
                     UIUtils.disableGameScreen(boardController);
-                    //boardController.gameState.nextTurn();
                     NetworkingUtils.sendGameState(boardController.gameState);
                 }
             });
@@ -76,20 +71,20 @@ public class CowExchangePopupController {
         Map<CowType, Integer> sellQuantities = getCowQuantities(sellTextFieldMap);
 
         if (!canSellCows(sellQuantities)) {
-            DialogUtils.showDialogAndDisable("Invalid sale", "You cannot sell more cows than you currently own.", Alert.AlertType.WARNING);
+            DialogUtils.showDialog("Invalid sale", "You cannot sell more cows than you currently own.", Alert.AlertType.WARNING);
             resetTextFields();
             return;
         }
 
         if (!canBuyMultipleCows(buyQuantities)) {
-            DialogUtils.showDialogAndDisable("Purchase limit", "With fewer than 5 cowboys, you can only buy one type of cow per transaction.", Alert.AlertType.WARNING);
+            DialogUtils.showDialog("Purchase limit", "With fewer than 5 cowboys, you can only buy one type of cow per transaction.", Alert.AlertType.WARNING);
             resetTextFields();
             return;
         }
 
         int totalCostValue = PopupUtils.calculateTransactionCost(buyQuantities, sellQuantities);
         if (totalCostValue > player.getMoney()) {
-            DialogUtils.showDialogAndDisable("Insufficient funds", "You don't have enough money to complete the purchase.", Alert.AlertType.WARNING);
+            DialogUtils.showDialog("Insufficient funds", "You don't have enough money to complete the purchase.", Alert.AlertType.WARNING);
             resetTextFields();
             return;
         }
@@ -100,16 +95,30 @@ public class CowExchangePopupController {
         int earnedVP = PopupUtils.calculateVPs(buyQuantities, sellQuantities);
         player.setVp(player.getVp() + earnedVP);
 
-        DialogUtils.showDialogAndDisable("Transaction complete",
-                "You earned " + earnedVP + " VPs from this transaction! Your budget is currently " + player.getMoney() + "$.",
-                Alert.AlertType.INFORMATION);
+        if (GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
+            DialogUtils.showDialog("Transaction complete",
+                    "You earned " + earnedVP + " VPs from this transaction! Your budget is currently " + player.getMoney() + "$.",
+                    Alert.AlertType.INFORMATION);
+        } else {
+            boolean transactionOccurred = false;
 
-        if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
-            UIUtils.disableGameScreen(boardController);
-            //boardController.gameState.nextTurn();
-            NetworkingUtils.sendGameState(boardController.gameState);
+            if (!PopupUtils.areAllQuantitiesZero(buyQuantities)) {
+                String buyMessage = DialogUtils.generateBuyTransactionMessage(buyQuantities);
+                NetworkingUtils.showDialogAndSendGameStateUpdate("Purchase Success", buyMessage);
+                transactionOccurred = true;
+            }
+
+            if (!PopupUtils.areAllQuantitiesZero(sellQuantities)) {
+                String sellMessage = DialogUtils.generateSellTransactionMessage(sellQuantities);
+                NetworkingUtils.showDialogAndSendGameStateUpdate("Sale Success", sellMessage);
+                transactionOccurred = true;
+            }
+
+            if (!transactionOccurred) {
+                UIUtils.disableGameScreen(boardController);
+                NetworkingUtils.sendGameState(boardController.gameState);
+            }
         }
-
         ((Stage) btnConfirm.getScene().getWindow()).close();
     }
 

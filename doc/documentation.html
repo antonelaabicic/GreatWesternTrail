@@ -22,11 +22,11 @@
    HIRING_CENTER
    TRAIN_STATION
 
+   public int getCost();
    public String toString();
    public static BuildingType[] values();
-   public static BuildingType valueOf(String arg0);
+   public static BuildingType valueOf(String name);
    public int getValue();
-   public int getCost();
 </pre></div><div class='class-section'><h3>Enum: hr.algebra.greatwesterntrail.model.CowType</h3><pre>public final enum CowType
 
    HOLSTEIN
@@ -34,9 +34,9 @@
    BLACK_ANGUS
    TEXAS_LONGHORN
 
-   public static CowType[] values();
-   public static CowType valueOf(String arg0);
    public int getCost();
+   public static CowType[] values();
+   public static CowType valueOf(String name);
    public int getVp();
 </pre></div><div class='class-section'><h3>Enum: hr.algebra.greatwesterntrail.model.HazardType</h3><pre>public final enum HazardType
 
@@ -45,7 +45,7 @@
    BANDITS
 
    public static HazardType[] values();
-   public static HazardType valueOf(String arg0);
+   public static HazardType valueOf(String name);
 </pre></div><div class='class-section'><h3>Enum: hr.algebra.greatwesterntrail.model.ObjectiveAction</h3><pre>public final enum ObjectiveAction
 
    BUY_HOLSTEIN
@@ -64,22 +64,22 @@
    FIRE_BUILDER
    ADVANCE_TRAIN_PROGRESS
 
-   public int getVictoryPoints();
-   public String getBaseDescription();
-   public static ObjectiveAction[] values();
-   public static ObjectiveAction valueOf(String arg0);
    public int getCost();
-   public boolean isBuyAction();
-   public boolean isFireAction();
    public boolean isSellAction();
    public boolean isHireAction();
+   public boolean isBuyAction();
+   public String getBaseDescription();
+   public int getVictoryPoints();
+   public boolean isFireAction();
+   public static ObjectiveAction[] values();
+   public static ObjectiveAction valueOf(String name);
 </pre></div><div class='class-section'><h3>Enum: hr.algebra.greatwesterntrail.model.ObjectiveStatus</h3><pre>public final enum ObjectiveStatus
 
    HAS_OBJECTIVE
    NO_OBJECTIVE
 
    public static ObjectiveStatus[] values();
-   public static ObjectiveStatus valueOf(String arg0);
+   public static ObjectiveStatus valueOf(String name);
 </pre></div><div class='class-section'><h3>Enum: hr.algebra.greatwesterntrail.model.PlayerMode</h3><pre>public final enum PlayerMode
 
    SINGLE_PLAYER
@@ -87,7 +87,7 @@
    PLAYER_TWO
 
    public static PlayerMode[] values();
-   public static PlayerMode valueOf(String arg0);
+   public static PlayerMode valueOf(String name);
 </pre></div><div class='class-section'><h3>Enum: hr.algebra.greatwesterntrail.model.TileType</h3><pre>public final enum TileType
 
    BUILDING
@@ -97,30 +97,31 @@
    END
 
    public static TileType[] values();
-   public static TileType valueOf(String arg0);
+   public static TileType valueOf(String name);
 </pre></div><div class='class-section'><h3>Enum: hr.algebra.greatwesterntrail.model.WorkerType</h3><pre>public final enum WorkerType
 
    COWBOY
    BUILDER
    ENGINEER
 
-   public static WorkerType[] values();
-   public static WorkerType valueOf(String arg0);
    public int getCost();
+   public static WorkerType[] values();
+   public static WorkerType valueOf(String name);
    public int getVp();
 </pre></div><div class='class-section'><h3>Enum: hr.algebra.greatwesterntrail.repository.TileRepository</h3><pre>public final enum TileRepository
 
    INSTANCE
 
+   public void setTiles(Tile[][] tiles);
+   private Objective createObjectiveForBuilding(BuildingType buildingType);
+   private void addObjectiveTooltip(Tile tile, Objective objective);
+   private ObjectiveAction randomObjective(List actions);
+   private void initializeTiles();
    public static TileRepository[] values();
-   public static TileRepository valueOf(String arg0);
-   private void assignObjectiveToRandomBuilding();
-   private void addObjectiveTooltip(Tile arg0, Objective arg1);
-   private Objective createObjectiveForBuilding(BuildingType arg0);
+   public static TileRepository valueOf(String name);
    public void resetTiles();
    public Tile[][] getTiles();
-   private ObjectiveAction randomObjective(List arg0);
-   private void initializeTiles();
+   private void assignObjectiveToRandomBuilding();
 </pre></div><h2>Classes</h2><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.controller.BoardController</h3><pre>public class BoardController
 
    public BoardController();
@@ -130,22 +131,29 @@
    public Button btnWorkers;
    public Button btnDeck;
    public GridPane boardGrid;
-   public VerticalProgressBar pbTrain;
-   private TileRepository tileRepository;
-   private TileButton[][] tileButtons;
-   private Player player;
+   public VerticalProgressBar pbTrain1;
+   public VerticalProgressBar pbTrain2;
+   public TileRepository tileRepository;
+   public TileButton[][] tileButtons;
+   public GameState gameState;
+   public static BoardController instance;
 
+   public static BoardController getInstance();
    public void initialize();
-   public void loadGame(ActionEvent actionEvent);
    public void saveGame(ActionEvent actionEvent);
-   private void initializeBoard();
+   public void loadGame(ActionEvent actionEvent);
    private void setupButtons();
-   public void onBtnPointsClicked(MouseEvent mouseEvent);
-   public void onBtnMoneyClicked(MouseEvent mouseEvent);
-   public void generateDocumentation(ActionEvent actionEvent);
-   public void onBtnWorkersClicked(MouseEvent mouseEvent);
-   public void startNewGame(ActionEvent actionEvent);
    public void onBtnDeckClicked(MouseEvent mouseEvent);
+   private void highlightPlayers();
+   private void initializeBoard(Tile[][] tiles);
+   public void onBtnMoneyClicked(MouseEvent mouseEvent);
+   public void startNewGame(ActionEvent actionEvent);
+   public void onBtnPointsClicked(MouseEvent mouseEvent);
+   public void setGameState(GameState gameState);
+   private void setupProgressBars();
+   public void onBtnWorkersClicked(MouseEvent mouseEvent);
+   public void generateDocumentation(ActionEvent actionEvent);
+   private void initializeGameState();
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.controller.CowDeckController</h3><pre>public class CowDeckController
 
    public CowDeckController();
@@ -155,7 +163,7 @@
    public Label angusCount;
    public Label longhornCount;
 
-   public void initialize(Player arg0);
+   public void initialize(Player player);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.controller.CowExchangePopupController</h3><pre>public class CowExchangePopupController
 
    public CowExchangePopupController();
@@ -171,19 +179,20 @@
    public Label totalCost;
    public Button btnConfirm;
    private Player player;
+   private BoardController boardController;
    private Map buyTextFieldMap;
    private Map sellTextFieldMap;
 
+   private void confirmPurchase();
    private void initializeTextFieldMaps();
    private void updateSellingTextFields();
-   public void initialize(Player arg0);
-   private void updateTotalCost();
-   private Map getCowQuantities(Map arg0);
-   private boolean canSellCows(Map arg0);
-   private boolean canBuyMultipleCows(Map arg0);
    private void resetTextFields();
-   private void updateCowDeck(Map arg0, Map arg1);
-   private void confirmPurchase();
+   private boolean canSellCows(Map sellQuantities);
+   private boolean canBuyMultipleCows(Map buyQuantities);
+   private void updateCowDeck(Map buyQuantities, Map sellQuantities);
+   private void updateTotalCost();
+   private Map getCowQuantities(Map textFieldMap);
+   public void initialize(Player player, BoardController boardController);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.controller.EmptyTilePopupController</h3><pre>public class EmptyTilePopupController
 
    public EmptyTilePopupController();
@@ -196,11 +205,12 @@
    private Player player;
    private final int REQUIRED_BUILDERS;
    private TileButton tileButton;
+   private BoardController boardController;
 
+   private void selectBuilding(BuildingType buildingType);
+   public void initialize(Player player, TileButton tileButton, BoardController boardController);
    private void deselectSelectedBuilding();
    private void confirm();
-   public void initialize(Player arg0, TileButton arg1);
-   private void selectBuilding(BuildingType arg0);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.controller.HiringCenterPopupController</h3><pre>public class HiringCenterPopupController
 
    public HiringCenterPopupController();
@@ -218,15 +228,15 @@
    private Map hireTextFieldMap;
    private Map fireTextFieldMap;
 
-   private Map getWorkerQuantities(Map arg0);
+   private void updateWorkerDeck(Map hireQuantities, Map fireQuantities);
+   private boolean canHireWorkers(Map fireQuantities);
    private void initializeTextFieldMaps();
    public void updateSellingTextFields();
-   private void confirm();
-   public void initialize(Player arg0, BoardController arg1);
-   private void updateTotalCost();
    private void resetTextFields();
-   private void updateWorkerDeck(Map arg0, Map arg1);
-   private boolean canHireWorkers(Map arg0);
+   private void updateTotalCost();
+   public void initialize(Player player, BoardController boardController);
+   private Map getWorkerQuantities(Map textFieldMap);
+   private void confirm();
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.controller.WorkerDeckController</h3><pre>public class WorkerDeckController
 
    public WorkerDeckController();
@@ -235,39 +245,76 @@
    public Label builderCount;
    public Label engineerCount;
 
-   public void initialize(Player arg0);
+   public void initialize(Player player);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.GreatWesternTrailApplication</h3><pre>public class GreatWesternTrailApplication
 
    public GreatWesternTrailApplication();
 
-   public static void main(String[] arg0);
-   public void start(Stage arg0);
-</pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.Objective</h3><pre>public class Objective
+   public static final String HOST;
+   public static final int PLAYER_TWO_SERVER_PORT;
+   public static final int PLAYER_ONE_SERVER_PORT;
+   public static PlayerMode playerMode;
 
-   public Objective(ObjectiveStatus arg0, ObjectiveAction arg1, int arg2);
+   public static void sendRequestFromPlayerTwo(GameState gameState);
+   public static void main(String[] args);
+   public void start(Stage stage);
+   private static void sendSerializableRequest(Socket client, GameState gameState);
+   private static void processSerializableClient(Socket clientSocket);
+   private static void playerOneAcceptRequests();
+   private static void playerTwoAcceptRequests();
+   public static void sendRequestFromPlayerOne(GameState gameState);
+</pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.GameState</h3><pre>public class GameState implements Serializable
 
+   public GameState(Player playerOne, Player playerTwo, Tile[][] tiles, boolean isPlayerOneTurn, String dialogMessage);
+
+   private static final long serialVersionUID;
+   private final Player playerOne;
+   private final Player playerTwo;
+   private final Tile[][] tiles;
+   private boolean isPlayerOneTurn;
+   private String dialogMessage;
+
+   public void nextTurn();
+   public boolean equals(Object o);
+   public String toString();
+   public int hashCode();
+   public String getDialogMessage();
+   public void setDialogMessage(String dialogMessage);
+   public Tile[][] getTiles();
+   protected boolean canEqual(Object other);
+   public Player getCurrentPlayer();
+   public boolean isPlayerOneTurn();
+   public Player getPlayerTwo();
+   public Player getPlayerOne();
+   public void setPlayerOneTurn(boolean isPlayerOneTurn);
+</pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.Objective</h3><pre>public class Objective implements Serializable
+
+   public Objective(ObjectiveStatus status, ObjectiveAction action, int quantity);
+
+   private static final long serialVersionUID;
    private ObjectiveStatus status;
    private ObjectiveAction action;
    private int quantity;
 
-   public int calculateTotalCost();
-   public void setQuantity(int arg0);
-   public String getDescription();
-   public boolean equals(Object arg0);
-   public String toString();
-   public int hashCode();
-   public int getQuantity();
+   public ObjectiveStatus getStatus();
+   public void setStatus(ObjectiveStatus status);
    public int calculateTotalVictoryPoints();
    public ObjectiveAction getAction();
-   protected boolean canEqual(Object arg0);
-   public ObjectiveStatus getStatus();
-   public void setStatus(ObjectiveStatus arg0);
-   public boolean isCompletedByPlayer(Player arg0);
-   public void setAction(ObjectiveAction arg0);
+   public void setAction(ObjectiveAction action);
+   public boolean isCompletedByPlayer(Player player);
+   public int getQuantity();
+   public void setQuantity(int quantity);
+   public int calculateTotalCost();
+   public boolean equals(Object o);
+   public String toString();
+   public int hashCode();
+   public String getDescription();
+   protected boolean canEqual(Object other);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.Player</h3><pre>public class Player implements Serializable
 
    public Player();
 
+   private static final long serialVersionUID;
    private Position playerPosition;
    private int vp;
    private int money;
@@ -282,99 +329,101 @@
    private int initialEngineers;
    private double trainObjectiveCheck;
    private double trainProgress;
-   private Consumer onTrainProgressMaxReached;
-   private Consumer onGameOver;
+   private transient Consumer onTrainProgressMaxReached;
+   private transient Consumer onGameOver;
 
-   public boolean equals(Object arg0);
+   public void setOnTrainProgressMaxReached(Consumer onTrainProgressMaxReached);
+   public Consumer getOnTrainProgressMaxReached();
+   public void setCowDeck(Map cowDeck);
+   public Map getCowDeck();
+   public void setObjectiveCompleted(boolean objectiveCompleted);
+   public int getInitialEngineers();
+   public void setTrainObjectiveCheck(double trainObjectiveCheck);
+   public double getTrainObjectiveCheck();
+   public void setInitialEngineers(int initialEngineers);
+   public Map getInitialWorkerDeck();
+   public boolean isObjectiveCompleted();
+   public boolean isBonusAwarded();
+   public boolean hasMetObjective(Objective objective);
+   public Consumer getOnGameOver();
+   public void setBonusAwarded(boolean bonusAwarded);
+   private boolean checkCowCount(CowType cowType, int quantity, ObjectiveAction action);
+   private Map initializeDeck(Class enumClass);
+   private boolean checkWorkerCount(WorkerType workerType, int quantity, ObjectiveAction action);
+   public void updatePeakValues(WorkerType workerType, int newCount);
+   public void updatePeakValues(CowType cowType, int newCount);
+   public void setPeakWorkerDeck(Map peakWorkerDeck);
+   public void setPeakCowDeck(Map peakCowDeck);
+   public void showGameOver(Objective objective);
+   public Map getPeakCowDeck();
+   public Map getPeakWorkerDeck();
+   public Map getInitialCowDeck();
+   public void setOnGameOver(Consumer onGameOver);
+   public void setPlayerPosition(Position playerPosition);
+   public void setPlayerPosition(int row, int column);
+   public void setWorkerDeck(Map workerDeck);
+   public double getTrainProgress();
+   public boolean equals(Object o);
    public String toString();
    public int hashCode();
-   public Consumer getOnTrainProgressMaxReached();
-   public boolean isObjectiveCompleted();
-   public void setInitialEngineers(int arg0);
-   public void setObjectiveCompleted(boolean arg0);
-   public void setTrainObjectiveCheck(double arg0);
-   public double getTrainObjectiveCheck();
-   public int getInitialEngineers();
-   public Map getInitialWorkerDeck();
-   public void setOnTrainProgressMaxReached(Consumer arg0);
-   public void setVp(int arg0);
-   public void setMoney(int arg0);
-   public int getMoney();
+   public void setMoney(int money);
+   public void setVp(int vp);
+   public void setTrainProgress(double trainProgress);
    public int getVp();
+   public int getMoney();
+   protected boolean canEqual(Object other);
    public Map getWorkerDeck();
    public Position getPlayerPosition();
-   public void setOnGameOver(Consumer arg0);
-   public void incrementTrainProgress(double arg0);
-   public void setTrainProgress(double arg0);
-   public double getTrainProgress();
-   public boolean isBonusAwarded();
-   public void setPeakWorkerDeck(Map arg0);
-   public boolean hasMetObjective(Objective arg0);
-   private boolean checkCowCount(CowType arg0, int arg1, ObjectiveAction arg2);
-   public Map getInitialCowDeck();
-   public Map getPeakWorkerDeck();
-   private Map initializeDeck(Class arg0);
-   public Consumer getOnGameOver();
-   public void showGameOver(Objective arg0);
-   public void setPlayerPosition(int arg0, int arg1);
-   public void setPlayerPosition(Position arg0);
-   private boolean checkWorkerCount(WorkerType arg0, int arg1, ObjectiveAction arg2);
-   public void updatePeakValues(WorkerType arg0, int arg1);
-   public void updatePeakValues(CowType arg0, int arg1);
-   public void setBonusAwarded(boolean arg0);
-   public Map getPeakCowDeck();
-   public void setWorkerDeck(Map arg0);
-   public void setPeakCowDeck(Map arg0);
-   public Map getCowDeck();
-   public void setCowDeck(Map arg0);
-   protected boolean canEqual(Object arg0);
-</pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.Position</h3><pre>public class Position
+   public void incrementTrainProgress(double increment);
+</pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.Position</h3><pre>public class Position implements Serializable
 
-   public Position(int arg0, int arg1);
+   public Position(int row, int column);
 
+   private static final long serialVersionUID;
    private int row;
    private int column;
 
-   public boolean equals(Object arg0);
+   public void setColumn(int column);
+   public void setRow(int row);
+   public int getColumn();
+   public boolean equals(Object o);
    public String toString();
    public int hashCode();
    public int getRow();
-   public int getColumn();
-   public void setRow(int arg0);
-   protected boolean canEqual(Object arg0);
-   public void setColumn(int arg0);
-</pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.Tile</h3><pre>public class Tile
+   protected boolean canEqual(Object other);
+</pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.Tile</h3><pre>public class Tile implements Serializable
 
-   public Tile(BuildingType arg0, Objective arg1);
-   public Tile(TileType arg0);
-   public Tile(HazardType arg0);
-   public Tile(BuildingType arg0);
+   public Tile(BuildingType buildingType, Objective objective);
+   public Tile(HazardType hazardType);
+   public Tile(TileType tileType);
+   public Tile(BuildingType buildingType);
 
+   private static final long serialVersionUID;
    private TileType tileType;
    private BuildingType buildingType;
    private HazardType hazardType;
    private Objective objective;
-   private StackPane icons;
+   private transient StackPane icons;
 
-   public void setIcons(StackPane arg0);
-   public void setIcons();
-   public boolean equals(Object arg0);
+   public Objective getObjective();
+   public void setObjective(Objective objective);
+   public void setBuildingType(BuildingType buildingType);
+   public void setHazardType(HazardType hazardType);
+   public boolean equals(Object o);
    public String toString();
    public int hashCode();
-   public StackPane getIcons();
-   public Objective getObjective();
-   public void setBuildingType(BuildingType arg0);
    private void setupIcons();
+   public void setIcons();
+   public void setIcons(StackPane icons);
+   public StackPane getIcons();
+   protected boolean canEqual(Object other);
    public BuildingType getBuildingType();
    public HazardType getHazardType();
-   public void setHazardType(HazardType arg0);
-   public void setTileType(TileType arg0);
+   public void setTileType(TileType tileType);
    public TileType getTileType();
-   public void setObjective(Objective arg0);
-   protected boolean canEqual(Object arg0);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.TileButton</h3><pre>public class TileButton
 
-   public TileButton(Tile arg0, Player arg1, BoardController arg2);
+   public TileButton(Tile tile, Player player, BoardController boardController);
 
    private final Tile tile;
    private final Player player;
@@ -384,14 +433,14 @@
    private static final int CROSS_HAZARD_VP;
    private static final int REMOVE_HAZARD_VP;
 
-   public Tile getTile();
-   private void showCattleExchangeDialog();
-   private void showTrainStationDialog();
-   private void showEmptyTileDialog();
-   private void showHiringCenterDialog();
-   private void handleTileAction();
    public void performAction();
-   private void handleHazardDialog(String arg0);
+   public Tile getTile();
+   private void handleHazardDialog(String hazardName);
+   private void handleTileAction();
+   private void showCattleExchangeDialog();
+   private void showEmptyTileDialog();
+   private void showTrainStationDialog();
+   private void showHiringCenterDialog();
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.model.VerticalProgressBar</h3><pre>public class VerticalProgressBar
 
    public VerticalProgressBar();
@@ -402,16 +451,20 @@
    private static final int MAX_PROGRESS_STEPS;
    private int currentProgressSteps;
 
-   public void setProgress(double arg0);
+   public void setProgress(double progress);
    protected void layoutChildren();
-   public void setBarColor(Color arg0);
+   public void setBarColor(Color color);
    public void incrementProgress();
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.DialogUtils</h3><pre>public final class DialogUtils
 
    private DialogUtils();
 
-   public static void showDialog(String arg0, String arg1, AlertType arg2);
-   public static boolean showConfirmDialog(String arg0, String arg1);
+   public static String generateBuyTransactionMessage(Map buyQuantities);
+   public static String generateSellTransactionMessage(Map sellQuantities);
+   public static void showDialog(String title, String content, AlertType alertType);
+   public static boolean showConfirmDialog(String title, String content);
+   public static void showDialogAndDisableWithoutGamestate(String title, String content, AlertType alertType);
+   public static void showDialogAndDisable(String title, String content, AlertType alertType);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.DocumentationUtils</h3><pre>public final class DocumentationUtils
 
    private DocumentationUtils();
@@ -420,88 +473,106 @@
    private static final String HTML_DOCUMENTATION_FILENAME;
    private static final String CLASS_FILE_EXTENSION;
 
-   private static String escapeHtml(String arg0);
-   private static String getInterfaces(Class arg0);
-   private static String getParameters(Parameter[] arg0);
-   private static String generateHtmlCode(List arg0);
-   private static void appendEnumInfo(Class arg0, StringBuilder arg1);
-   private static String generateClassInfo(Class arg0);
-   private static void appendConstructors(Class arg0, StringBuilder arg1);
-   private static void appendClassInfo(Class arg0, StringBuilder arg1);
-   private static boolean isValidMethod(Method arg0);
-   private static void appendFields(Class arg0, StringBuilder arg1);
-   private static Map categorizeClasses(List arg0);
-   private static void appendMethods(Class arg0, StringBuilder arg1);
-   private static Class getClassFromPath(Path arg0);
+   private static boolean isValidMethod(Method method);
+   private static void appendMethods(Class clazz, StringBuilder info);
+   private static Class getClassFromPath(Path classPath);
+   private static String getInterfaces(Class clazz);
+   private static String getParameters(Parameter[] parameters);
    public static void generateDocumentation();
+   private static String escapeHtml(String input);
+   private static void appendEnumInfo(Class clazz, StringBuilder info);
+   private static void appendConstructors(Class clazz, StringBuilder info);
+   private static void appendFields(Class clazz, StringBuilder info);
+   private static void appendClassInfo(Class clazz, StringBuilder info);
+   private static String generateHtmlCode(List classes);
+   private static String generateClassInfo(Class clazz);
+   private static Map categorizeClasses(List classes);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.GameStateUtils</h3><pre>public final class GameStateUtils
 
    private GameStateUtils();
 
-   public static void showWinnerDialog(Player arg0);
+   private static final String SAVE_GAME_FILE_NAME;
+
+   public static void applyLoadedGameState(GameState loadedState);
+   public static boolean checkForWinner(GameState gameState);
+   public static void saveGame(GameState gameState);
+   public static void loadGame();
+   public static void showWinnerDialog(Player player);
+   public static void saveGameToFile(GameState gameState);
+   public static GameState loadGameFromFile();
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.GameUtils</h3><pre>public final class GameUtils
 
    private GameUtils();
 
    private static boolean hasMovedThisTurn;
 
-   private static boolean isValidPosition(int arg0, int arg1);
-   public static void handleKeyboardNavigation(KeyEvent arg0, Player arg1, TileButton[][] arg2);
+   private static boolean isValidPosition(int row, int column);
+   public static void handleKeyboardNavigation(KeyEvent event, Player player, TileButton[][] tileButtons);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.ImageUtils</h3><pre>public final class ImageUtils
 
    private ImageUtils();
 
-   public static ImageView createImageView(String arg0, double arg1, double arg2);
-   public static void addIconToStackPane(StackPane arg0, String arg1, double arg2, double arg3, Pos arg4);
+   public static void addIconToStackPane(StackPane stackPane, String imagePath, double width, double height, Pos position);
+   public static ImageView createImageView(String imagePath, double width, double height);
+</pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.NetworkingUtils</h3><pre>public class NetworkingUtils
+
+   public NetworkingUtils();
+
+   public static void sendGameState(GameState gameState);
+   public static void showDialogAndSendGameStateUpdate(String title, String content);
+   public static void showDialogAndSendGameStateUpdateNoDisable(String title, String content);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.PopupUtils</h3><pre>public final class PopupUtils
 
    private PopupUtils();
 
-   public static transient Map createEnumTextFieldMap(Class arg0, TextField[] arg1);
-   public static void updateSellingTextFields(Map arg0, Map arg1, Enum[] arg2);
-   public static transient void addCostCalculationListener(Runnable arg0, TextField[] arg1);
-   public static int calculateTransactionCost(Map arg0, Map arg1);
-   public static int parseTextFieldValue(TextField arg0);
-   public static void updateDeck(Map arg0, Map arg1, Map arg2);
-   public static transient void setInputValidation(TextField[] arg0);
-   public static int calculateVPs(Map arg0, Map arg1);
-   public static transient Map getQuantities(Enum[] arg0, TextField[] arg1);
-   public static transient void resetTextFields(TextField[] arg0);
-   private static int calculateItemCosts(Map arg0);
+   public static int parseTextFieldValue(TextField textField);
+   public static void updateDeck(Map deck, Map itemsToAdd, Map itemsToRemove);
+   public static transient Map getQuantities(Enum[] enumTypes, TextField[] fields);
+   public static transient void addCostCalculationListener(Runnable updateFunction, TextField[] textFields);
+   public static int calculateTransactionCost(Map itemsToAdd, Map itemsToRemove);
+   public static void updateSellingTextFields(Map textFieldMap, Map playerDeck, Enum[] enumValues);
+   public static transient Map createEnumTextFieldMap(Class enumClass, TextField[] fields);
+   public static transient void resetTextFields(TextField[] textFields);
+   public static int calculateVPs(Map itemsOwned, Map itemsAcquired);
+   public static transient void setInputValidation(TextField[] textFields);
+   private static int calculateItemCosts(Map items);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.SceneUtils</h3><pre>public final class SceneUtils
 
    private SceneUtils();
 
-   public static void loadMainScene(Stage arg0, Class arg1, String arg2, String arg3);
-   private static transient void invokeMatchingInitializeMethod(Object arg0, Object[] arg1);
-   public static transient void loadScene(Class arg0, String arg1, String arg2, Object[] arg3);
+   public static void loadMainScene(Stage stage, Class appClass, String fxmlPath, String title);
+   public static transient void loadScene(Class appClass, String fxmlPath, String title, Object[] dependencies);
+   private static transient void invokeMatchingInitializeMethod(Object controller, Object[] dependencies);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.SerializationUtils</h3><pre>public final class SerializationUtils
 
    private SerializationUtils();
 
-   public static void write(Serializable arg0, String arg1);
-   public static Serializable read(String arg0);
+   public static void write(Serializable t, String filename);
+   public static Serializable read(String filename);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.TileUtils</h3><pre>public final class TileUtils
 
    private TileUtils();
 
-   private static void clearAllHighlights(TileButton[][] arg0);
-   public static StackPane createTileStack(Tile arg0, Player arg1, BoardController arg2);
-   public static void highlightCurrentTile(Position arg0, TileButton[][] arg1);
-   private static void setHighlightVisible(TileButton arg0);
+   public static void clearAllHighlights(TileButton[][] tileButtons);
+   public static StackPane createTileStack(Tile tile, Player player, BoardController boardController);
+   public static void highlightTwoPlayers(Player playerOne, Player playerTwo, TileButton[][] tileButtons);
+   public static void highlightSinglePlayer(Position playerPosition, TileButton[][] tileButtons);
+   private static void showCircle(TileButton tileButton, int circleIndex);
+   private static Circle buildHighlightCircle(Color color);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.TrainProgressUtils</h3><pre>public final class TrainProgressUtils
 
    private TrainProgressUtils();
 
    public static final int MAX_PROGRESS_STEPS;
 
-   public static void updateTrainProgressBar(VerticalProgressBar arg0, double arg1);
+   public static void updateTrainProgressBar(VerticalProgressBar progressBar, double trainProgress);
 </pre></div><div class='class-section'><h3>Class: hr.algebra.greatwesterntrail.utils.UIUtils</h3><pre>public final class UIUtils
 
    private UIUtils();
 
-   public static void enableGameScreen(BoardController arg0);
-   public static void disableGameScreen(BoardController arg0, Player arg1);
+   public static void enableGameScreen(BoardController boardController);
+   public static void disableGameScreen(BoardController boardController);
+   public static void disableGameScreenAtEnd(BoardController boardController, Player player);
 </pre></div><h2>Interfaces</h2><div class='class-section'><h3>Interface: hr.algebra.greatwesterntrail.shared.Tradeable</h3><pre>public abstract interface class Tradeable
 
    public abstract int getCost();
