@@ -3,26 +3,38 @@ package hr.algebra.greatwesterntrail.controller;
 import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
 import hr.algebra.greatwesterntrail.model.*;
 import hr.algebra.greatwesterntrail.repository.TileRepository;
+import hr.algebra.greatwesterntrail.rmi.ChatRemoteService;
+import hr.algebra.greatwesterntrail.rmi.ChatServer;
 import hr.algebra.greatwesterntrail.utils.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 public class BoardController {
     @FXML
-    public Button btnPoints, btnMoney, btnWorkers, btnDeck;
+    public Button btnPoints, btnMoney, btnWorkers, btnDeck, btnSend;
     @FXML
     public GridPane boardGrid;
     @FXML
     public VerticalProgressBar pbTrain1, pbTrain2;
+    @FXML
+    public TextField tfChatMessages;
+    @FXML
+    public TextArea taChatMessages, taLastMove;
 
     public TileRepository tileRepository;
     public TileButton[][] tileButtons = new TileButton[TileRepository.GRID_SIZE][TileRepository.GRID_SIZE];
@@ -30,15 +42,20 @@ public class BoardController {
     public GameState gameState;
     @Getter
     public static BoardController instance;
+
     public BoardController() { instance = this; }
+
+    private static Registry registry;
+    private static ChatRemoteService chatRemoteService;
 
     public void initialize() {
         initializeGameState();
         setupButtons();
 
         Platform.runLater(() -> {
-            boardGrid.requestFocus();
             GameUtils.highlightPlayers();
+            GameUtils.toggleChatAndLastMoveVisibility();
+            boardGrid.requestFocus();
         });
         boardGrid.setOnKeyPressed(event -> {
             Player active = gameState.getCurrentPlayer();
@@ -47,9 +64,19 @@ public class BoardController {
                 GameUtils.highlightPlayers();
             }
         });
-        if (PlayerMode.PLAYER_TWO.name().equals(GreatWesternTrailApplication.playerMode.name())) {
+        if (GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_TWO) {
             UIUtils.disableGameScreen(instance);
         }
+
+
+
+        try {
+            registry = LocateRegistry.getRegistry(ChatServer.CHAT_HOST_NAME, ChatServer.RMI_PORT);
+            chatRemoteService = (ChatRemoteService) registry.lookup(ChatRemoteService.CHAT_REMOTE_OBJECT_NAME);
+        } catch (RemoteException | NotBoundException e) {
+            throw new RuntimeException(e);
+        }
+        ChatUtils.createAndRunChatTimeline(chatRemoteService, taChatMessages);
     }
 
     private void initializeGameState() {
@@ -119,6 +146,7 @@ public class BoardController {
             this.gameState = new GameState(new Player(), new Player(), tileRepository.getTiles(), true, null, false);
             GameStateUtils.saveGameToFile(this.gameState);
             GameStateUtils.applyLoadedGameState(this.gameState);
+            taChatMessages.clear();
             NetworkingUtils.showDialogAndSendGameStateUpdate(
                     "New game",
                     GreatWesternTrailApplication.playerMode + " has started a new game."
@@ -140,5 +168,11 @@ public class BoardController {
         } catch (RuntimeException e) {
             DialogUtils.showDialogAndDisable("Error", "Something went wrong while generating documentation.", Alert.AlertType.ERROR);
         }
+    }
+
+    public void sendChatMessage(ActionEvent actionEvent) {
+        ChatUtils.sendChatMessage(tfChatMessages, taChatMessages, chatRemoteService);
+        tfChatMessages.clear();
+        boardGrid.requestFocus();
     }
 }

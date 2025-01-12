@@ -150,4 +150,18 @@ public final class GameUtils {
             SceneUtils.loadScene(GreatWesternTrailApplication.class, fxmlPath, title, active);
         }
     }
+
+    public static void toggleChatAndLastMoveVisibility() {
+        if (GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
+            BoardController.getInstance().taChatMessages.setVisible(false);
+            BoardController.getInstance().taChatMessages.setManaged(false);
+            BoardController.getInstance().btnSend.setVisible(false);
+            BoardController.getInstance().btnSend.setManaged(false);
+            BoardController.getInstance().tfChatMessages.setVisible(false);
+            BoardController.getInstance().tfChatMessages.setManaged(false);
+        } else {
+            BoardController.getInstance().taLastMove.setVisible(false);
+            BoardController.getInstance().taLastMove.setManaged(false);
+        }
+    }
 }

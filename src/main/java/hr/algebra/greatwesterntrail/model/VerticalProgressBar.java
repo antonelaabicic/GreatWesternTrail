@@ -10,7 +10,6 @@ public class VerticalProgressBar extends Region {
     private Color barColor = Color.RED;
     private Rectangle progressRect;
 
-    //
     private static final int MAX_PROGRESS_STEPS = 20;
     private int currentProgressSteps = 0;
 
@@ -41,7 +40,6 @@ public class VerticalProgressBar extends Region {
         requestLayout();
     }
 
-    //
     public void incrementProgress() {
         if (currentProgressSteps < MAX_PROGRESS_STEPS) {
             currentProgressSteps++;
