@@ -109,4 +109,82 @@ public final class GameStateUtils {
 
         TileUtils.highlightTwoPlayers(player1, player2, boardController.tileButtons);
     }
+
+    public static void initializeSinglePlayerGameState() {
+        BoardController.getInstance().tileRepository = TileRepository.INSTANCE;
+        Tile[][] tiles = BoardController.getInstance().tileRepository.getTiles();
+        BoardController.getInstance().gameState = new GameState(
+                new Player(),
+                null,
+                tiles,
+                true,
+                null,
+                false
+        );
+        initializeBoard(BoardController.getInstance().gameState.getTiles());
+        GameUtils.setupProgressBars();
+    }
+
+    private static void initializeBoard(Tile[][] tiles) {
+        BoardController.getInstance().boardGrid.getChildren().clear();
+        for (int row = 0; row < TileRepository.GRID_SIZE; row++) {
+            for (int col = 0; col < TileRepository.GRID_SIZE; col++) {
+                Tile tile = tiles[row][col];
+                StackPane tileStack = TileUtils.createTileStack(
+                        tile, BoardController.getInstance().gameState.getCurrentPlayer(),
+                        BoardController.getInstance());
+                BoardController.getInstance().boardGrid.add(tileStack, col, row);
+
+                TileButton tileButton = (TileButton) tileStack.getChildren().getFirst();
+                BoardController.getInstance().tileButtons[row][col] = tileButton;
+            }
+        }
+    }
+
+    public static void initializeMultiPlayerGameState() {
+        GameState loadedState = GameStateUtils.loadGameFromFile();
+        if (loadedState != null || GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
+            BoardController.getInstance().gameState = loadedState;
+            applyLoadedGameState(loadedState);
+        } else {
+            BoardController.getInstance().tileRepository = TileRepository.INSTANCE;
+            Tile[][] tiles = BoardController.getInstance().tileRepository.getTiles();
+            BoardController.getInstance().gameState = new GameState(
+                    new Player(),
+                    new Player(),
+                    tiles,
+                    GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE,
+                    null,
+                    false
+            );
+            saveGameToFile(BoardController.getInstance().gameState);
+            applyLoadedGameState(BoardController.getInstance().gameState);
+            GameUtils.setupProgressBars();
+        }
+    }
+
+    public static void startNewGameSinglePlayer() {
+        BoardController.getInstance().tileRepository.resetTiles();
+        BoardController.getInstance().initialize();
+        DialogUtils.showDialogAndDisable("New game", "A new game has started!", Alert.AlertType.INFORMATION);
+    }
+
+    public static void startNewGameMultiPlayer() {
+        BoardController.getInstance().tileRepository = TileRepository.INSTANCE;
+        BoardController.getInstance().gameState = new GameState(
+                new Player(),
+                new Player(),
+                BoardController.getInstance().tileRepository.getTiles(),
+                true,
+                null,
+                false
+        );
+        saveGameToFile(BoardController.getInstance().gameState);
+        applyLoadedGameState(BoardController.getInstance().gameState);
+        BoardController.getInstance().taChatMessages.clear();
+        NetworkingUtils.showDialogAndSendGameStateUpdate(
+                "New game",
+                GreatWesternTrailApplication.playerMode + " has started a new game."
+        );
+    }
 }

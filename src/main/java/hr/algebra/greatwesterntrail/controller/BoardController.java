@@ -68,8 +68,6 @@ public class BoardController {
             UIUtils.disableGameScreen(instance);
         }
 
-
-
         try {
             registry = LocateRegistry.getRegistry(ChatServer.CHAT_HOST_NAME, ChatServer.RMI_PORT);
             chatRemoteService = (ChatRemoteService) registry.lookup(ChatRemoteService.CHAT_REMOTE_OBJECT_NAME);
@@ -81,39 +79,9 @@ public class BoardController {
 
     private void initializeGameState() {
         if (GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
-            tileRepository = TileRepository.INSTANCE;
-            Tile[][] tiles = tileRepository.getTiles();
-            this.gameState = new GameState(new Player(), null, tiles, true, null, false);
-            initializeBoard(gameState.getTiles());
-            GameUtils.setupProgressBars();
+            GameStateUtils.initializeSinglePlayerGameState();
         } else {
-            GameState loadedState = GameStateUtils.loadGameFromFile();
-            if (loadedState != null || GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
-                this.gameState = loadedState;
-                GameStateUtils.applyLoadedGameState(loadedState);
-            } else {
-                tileRepository = TileRepository.INSTANCE;
-                Tile[][] tiles = tileRepository.getTiles();
-                this.gameState = new GameState(new Player(), new Player(), tiles,
-                        GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE, null, false);
-                GameStateUtils.saveGameToFile(this.gameState);
-                GameStateUtils.applyLoadedGameState(this.gameState);
-                GameUtils.setupProgressBars();
-            }
-        }
-    }
-
-    public void initializeBoard(Tile[][] tiles) {
-        boardGrid.getChildren().clear();
-        for (int row = 0; row < TileRepository.GRID_SIZE; row++) {
-            for (int col = 0; col < TileRepository.GRID_SIZE; col++) {
-                Tile tile = tiles[row][col];
-                StackPane tileStack = TileUtils.createTileStack(tile, gameState.getCurrentPlayer(), this);
-                boardGrid.add(tileStack, col, row);
-
-                TileButton tileButton = (TileButton) tileStack.getChildren().getFirst();
-                tileButtons[row][col] = tileButton;
-            }
+            GameStateUtils.initializeMultiPlayerGameState();
         }
     }
 
@@ -142,19 +110,9 @@ public class BoardController {
 
     public void startNewGame(ActionEvent actionEvent) {
         if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
-            tileRepository = TileRepository.INSTANCE;
-            this.gameState = new GameState(new Player(), new Player(), tileRepository.getTiles(), true, null, false);
-            GameStateUtils.saveGameToFile(this.gameState);
-            GameStateUtils.applyLoadedGameState(this.gameState);
-            taChatMessages.clear();
-            NetworkingUtils.showDialogAndSendGameStateUpdate(
-                    "New game",
-                    GreatWesternTrailApplication.playerMode + " has started a new game."
-            );
+            GameStateUtils.startNewGameMultiPlayer();
         } else {
-            tileRepository.resetTiles();
-            initialize();
-            DialogUtils.showDialogAndDisable("New game", "A new game has started!", Alert.AlertType.INFORMATION);
+            GameStateUtils.startNewGameSinglePlayer();
         }
     }
 
