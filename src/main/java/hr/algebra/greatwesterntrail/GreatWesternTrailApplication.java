@@ -89,6 +89,19 @@ public class GreatWesternTrailApplication extends Application {
              ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());){
 
             GameState receivedState = (GameState) ois.readObject();
+            if (receivedState.isGameFinished()) {
+                System.out.println("Game finished, no further processing needed.");
+                Platform.runLater(() -> {
+                    DialogUtils.showDialog(
+                            "Message from Opponent",
+                            receivedState.getDialogMessage(),
+                            Alert.AlertType.INFORMATION
+                    );
+                });
+                oos.writeObject("Game Over");
+                return;
+            }
+
             Platform.runLater(() -> {
                 BoardController.getInstance().gameState = receivedState;
                 GameStateUtils.applyLoadedGameState(receivedState);
@@ -98,18 +111,6 @@ public class GreatWesternTrailApplication extends Application {
                     DialogUtils.showDialog("Message from Opponent", receivedState.getDialogMessage(), Alert.AlertType.INFORMATION);
                     receivedState.setDialogMessage(null);
                 }
-
-                // popravi
-                boolean isFinished = GameStateUtils.checkForWinner(receivedState);
-                if (isFinished) {
-
-                } //else {
-//                    if (receivedState.isPlayerOneTurn() && PlayerMode.PLAYER_ONE == playerMode) {
-//                        UIUtils.enableGameScreen(BoardController.getInstance());
-//                    } else if (!receivedState.isPlayerOneTurn() && PlayerMode.PLAYER_TWO == playerMode) {
-//                        UIUtils.enableGameScreen(BoardController.getInstance());
-//                    }
-//                }
             });
 
             System.out.println("Game state successfuly received: " + BoardController.getInstance().gameState);

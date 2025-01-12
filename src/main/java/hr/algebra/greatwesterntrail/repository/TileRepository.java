@@ -75,7 +75,7 @@ public enum TileRepository {
         }
     }
 
-    private void addObjectiveTooltip(Tile tile, Objective objective) {
+    public void addObjectiveTooltip(Tile tile, Objective objective) {
         Tooltip tooltip = new Tooltip(objective.getDescription());
         Tooltip.install(tile.getIcons(), tooltip);
     }

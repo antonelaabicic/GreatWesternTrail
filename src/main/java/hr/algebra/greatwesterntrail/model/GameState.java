@@ -16,7 +16,8 @@ public class GameState implements Serializable {
     private final Player playerTwo;
     private final Tile[][] tiles;
     private boolean isPlayerOneTurn;
-    private String dialogMessage; //
+    private String dialogMessage;
+    private boolean gameFinished;
 
     public Player getCurrentPlayer() {
         return isPlayerOneTurn ? playerOne : playerTwo;

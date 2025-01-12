@@ -47,9 +47,8 @@ public class HiringCenterPopupController {
 
         updateSellingTextFields();
         updateTotalCost();
-        player.setOnTrainProgressMaxReached(GameStateUtils::showWinnerDialog);
+        player.setOnTrainProgressMaxReached(GameUtils::showWinnerDialog);
 
-        //
         Platform.runLater(() -> {
             Stage stage = (Stage) btnConfirm.getScene().getWindow();
             stage.setOnCloseRequest(event -> {

@@ -55,7 +55,7 @@ public class TileButton extends Button {
                 }
             }
             case END -> {
-                GameStateUtils.showWinnerDialog(player);
+                GameUtils.showWinnerDialog(player);
             }
         }
     }
@@ -111,12 +111,25 @@ public class TileButton extends Button {
         int steps = 1 + random.nextInt(5);
         player.incrementTrainProgress(steps);
         player.setTrainProgress(player.getTrainProgress());
-        TrainProgressUtils.updateTrainProgressBar(
-                GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE ?
-                boardController.pbTrain1 : boardController.pbTrain2, player.getTrainProgress());
 
-        NetworkingUtils.showDialogAndSendGameStateUpdate("Success",
-                GreatWesternTrailApplication.playerMode.name() + " has moved " + steps + " on the train track!");
+        if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
+            TrainProgressUtils.updateTrainProgressBar(
+                    GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE ?
+                            boardController.pbTrain1 : boardController.pbTrain2, player.getTrainProgress());
+        } else {
+            TrainProgressUtils.updateTrainProgressBar(boardController.pbTrain1, player.getTrainProgress());
+        }
+        if (player.getVp() > 99 && player.getTrainProgress() > 21) {
+            BoardController.getInstance().gameState.setGameFinished(true);
+            NetworkingUtils.showDialogAndSendGameStateUpdate(
+                    "Success",
+                    GreatWesternTrailApplication.playerMode +" has won! \nThey're in " +
+                            "Kansas and have " + player.getVp() + " VPs."
+            );
+        } else {
+            NetworkingUtils.showDialogAndSendGameStateUpdate("Success",
+                    GreatWesternTrailApplication.playerMode.name() + " has moved " + steps + " on the train track!");
+        }
     }
 
     private void showHiringCenterDialog() {
