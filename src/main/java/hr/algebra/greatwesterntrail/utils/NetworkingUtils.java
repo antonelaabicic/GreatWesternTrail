@@ -2,6 +2,8 @@ package hr.algebra.greatwesterntrail.utils;
 
 import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
 import hr.algebra.greatwesterntrail.controller.BoardController;
+import hr.algebra.greatwesterntrail.model.ConfigurationKey;
+import hr.algebra.greatwesterntrail.model.ConfigurationReader;
 import hr.algebra.greatwesterntrail.model.GameState;
 import hr.algebra.greatwesterntrail.model.PlayerMode;
 import javafx.scene.control.Alert;
@@ -9,10 +11,18 @@ import javafx.scene.control.Alert;
 public class NetworkingUtils {
     public static void sendGameState(GameState gameState) {
         if (GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE) {
-            GreatWesternTrailApplication.sendRequestFromPlayerOne(gameState);
+            GreatWesternTrailApplication.sendRequestFromPlayer(
+                    gameState,
+                    ConfigurationReader.getStringValueForKey(ConfigurationKey.HOST),
+                    ConfigurationReader.getIntegerValueForKey(ConfigurationKey.PLAYER_TWO_SERVER_PORT)
+            );
         }
         else if (GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_TWO) {
-            GreatWesternTrailApplication.sendRequestFromPlayerTwo(gameState);
+            GreatWesternTrailApplication.sendRequestFromPlayer(
+                    gameState,
+                    ConfigurationReader.getStringValueForKey(ConfigurationKey.HOST),
+                    ConfigurationReader.getIntegerValueForKey(ConfigurationKey.PLAYER_ONE_SERVER_PORT)
+            );
         }
     }
 

@@ -1,6 +1,8 @@
 package hr.algebra.greatwesterntrail;
 
 import hr.algebra.greatwesterntrail.controller.BoardController;
+import hr.algebra.greatwesterntrail.model.ConfigurationKey;
+import hr.algebra.greatwesterntrail.model.ConfigurationReader;
 import hr.algebra.greatwesterntrail.model.GameState;
 import hr.algebra.greatwesterntrail.model.PlayerMode;
 import hr.algebra.greatwesterntrail.utils.DialogUtils;
@@ -23,8 +25,8 @@ import java.net.Socket;
 public class GreatWesternTrailApplication extends Application {
 
     public static final String HOST = "localhost";
-    public static final int PLAYER_TWO_SERVER_PORT = 1989;
-    public static final int PLAYER_ONE_SERVER_PORT = 1990;
+//    public static final int PLAYER_TWO_SERVER_PORT = 1989;
+//    public static final int PLAYER_ONE_SERVER_PORT = 1990;
 
     public static PlayerMode playerMode;
 
@@ -40,11 +42,13 @@ public class GreatWesternTrailApplication extends Application {
         try {
             playerMode = PlayerMode.valueOf(args[0]);
             if(PlayerMode.PLAYER_TWO.name().equals(playerMode.name())) {
-                Thread serverThread = new Thread(() -> playerTwoAcceptRequests());
+                Thread serverThread = new Thread(() -> acceptRequestsFromPlayer(
+                        ConfigurationReader.getIntegerValueForKey(ConfigurationKey.PLAYER_TWO_SERVER_PORT)));
                 serverThread.start();
             }
             else if(PlayerMode.PLAYER_ONE.name().equals(playerMode.name())) {
-                Thread serverThread = new Thread(() -> playerOneAcceptRequests());
+                Thread serverThread = new Thread(() -> acceptRequestsFromPlayer(
+                        ConfigurationReader.getIntegerValueForKey(ConfigurationKey.PLAYER_ONE_SERVER_PORT)));
                 serverThread.start();
             }
             launch();
@@ -56,28 +60,14 @@ public class GreatWesternTrailApplication extends Application {
         }
     }
 
-    private static void playerTwoAcceptRequests() {
-        try (ServerSocket serverSocket = new ServerSocket(PLAYER_TWO_SERVER_PORT)){
+    private static void acceptRequestsFromPlayer(Integer port) {
+        try (ServerSocket serverSocket = new ServerSocket(port)){
             System.err.printf("Server listening on port: %d%n", serverSocket.getLocalPort());
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.err.printf("Client connected from port %s%n", clientSocket.getPort());
                 new Thread(() ->  processSerializableClient(clientSocket)).start();
-            }
-        }  catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void playerOneAcceptRequests() {
-        try (ServerSocket serverSocket = new ServerSocket(PLAYER_ONE_SERVER_PORT)){
-            System.err.printf("Server listening on port: %d%n", serverSocket.getLocalPort());
-
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                System.err.printf("Client connected from port %s%n", clientSocket.getPort());
-                new Thread(() -> processSerializableClient(clientSocket)).start();
             }
         }  catch (IOException e) {
             e.printStackTrace();
@@ -120,18 +110,10 @@ public class GreatWesternTrailApplication extends Application {
         }
     }
 
-    public static void sendRequestFromPlayerOne(GameState gameState) {
-        try (Socket clientSocket = new Socket(HOST, PLAYER_TWO_SERVER_PORT)){
+    public static void sendRequestFromPlayer(GameState gameState, String hostName, Integer port) {
+        try (Socket clientSocket = new Socket(hostName, port)){
             System.err.printf("Client is connecting to %s:%d%n", clientSocket.getInetAddress(), clientSocket.getPort());
-            sendSerializableRequest(clientSocket, gameState);
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public static void sendRequestFromPlayerTwo(GameState gameState) {
-        try (Socket clientSocket = new Socket(HOST, PLAYER_ONE_SERVER_PORT)){
-            System.err.printf("Client is connecting to %s:%d%n", clientSocket.getInetAddress(), clientSocket.getPort());
             sendSerializableRequest(clientSocket, gameState);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
