@@ -18,4 +18,20 @@ public enum CowType implements Tradeable {
         this.cost = cost;
         this.vp = vp;
     }
+
+    @Override
+    public String toString() {
+        String formatted = name().replace("_", " ").toLowerCase();
+
+        String[] words = formatted.split(" ");
+        StringBuilder capitalized = new StringBuilder();
+
+        for (String word : words) {
+            capitalized.append(word.substring(0, 1).toUpperCase())
+                    .append(word.substring(1))
+                    .append(" ");
+        }
+
+        return capitalized.toString().trim();
+    }
 }

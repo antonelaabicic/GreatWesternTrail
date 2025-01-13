@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class GameState implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1001L;
 
     private final Player playerOne;

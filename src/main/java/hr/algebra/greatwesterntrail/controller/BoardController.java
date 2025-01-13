@@ -68,13 +68,18 @@ public class BoardController {
             UIUtils.disableGameScreen(instance);
         }
 
-        try {
-            registry = LocateRegistry.getRegistry(ChatServer.CHAT_HOST_NAME, ChatServer.RMI_PORT);
-            chatRemoteService = (ChatRemoteService) registry.lookup(ChatRemoteService.CHAT_REMOTE_OBJECT_NAME);
-        } catch (RemoteException | NotBoundException e) {
-            throw new RuntimeException(e);
+        if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
+            try {
+                registry = LocateRegistry.getRegistry(ChatServer.CHAT_HOST_NAME, ChatServer.RMI_PORT);
+                chatRemoteService = (ChatRemoteService) registry.lookup(ChatRemoteService.CHAT_REMOTE_OBJECT_NAME);
+            } catch (RemoteException | NotBoundException e) {
+                throw new RuntimeException(e);
+            }
+            ChatUtils.createAndRunChatTimeline(chatRemoteService, taChatMessages);
+        } else {
+            taLastMove.clear();
+            GameMoveUtils.createAndRunTheLastGameMoveTimeline(taLastMove);
         }
-        ChatUtils.createAndRunChatTimeline(chatRemoteService, taChatMessages);
     }
 
     private void initializeGameState() {

@@ -101,7 +101,7 @@ public class TileButton extends Button {
         } else {
             DialogUtils.showDialogAndDisable(
                     "Insufficient Funds",
-                    GreatWesternTrailApplication.playerMode.name() + " doesn't have enough money to " + (removeHazard ? "remove" : "cross") + hazardName,
+                    GreatWesternTrailApplication.playerMode.name() + " doesn't have enough money to " + (removeHazard ? "remove " : "cross ") + hazardName + ".",
                     Alert.AlertType.ERROR);
         }
     }

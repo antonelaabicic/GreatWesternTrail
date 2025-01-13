@@ -9,6 +9,7 @@ import hr.algebra.greatwesterntrail.model.WorkerType;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -89,9 +90,13 @@ public final class DialogUtils {
                 if (!first) {
                     message.append(", ");
                 }
-                message.append(quantity).append(" ").append(item.toString().toLowerCase());
+                message.append(quantity).append(" ").append(item.toString());
                 if (quantity > 1) {
-                    message.append("s");
+                    if (item instanceof CowType cow && (cow == CowType.JERSEY || cow == CowType.BLACK_ANGUS)) {
+                        message.append("es");
+                    } else {
+                        message.append("s");
+                    }
                 }
                 first = false;
             }

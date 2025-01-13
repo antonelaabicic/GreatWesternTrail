@@ -4,6 +4,7 @@ import hr.algebra.greatwesterntrail.GreatWesternTrailApplication;
 import hr.algebra.greatwesterntrail.controller.BoardController;
 import hr.algebra.greatwesterntrail.model.*;
 import hr.algebra.greatwesterntrail.repository.TileRepository;
+import hr.algebra.greatwesterntrail.thread.SaveGameMoveThread;
 import javafx.scene.control.Alert;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
@@ -17,6 +18,8 @@ public final class GameUtils {
     private GameUtils() { }
 
     public static void handleKeyboardNavigation(KeyEvent event, Player player, TileButton[][] tileButtons) {
+        BoardController.getInstance().boardGrid.requestFocus();
+
         int currentRow = player.getPlayerPosition().getRow();
         int currentCol = player.getPlayerPosition().getColumn();
         int newRow = currentRow;
@@ -41,6 +44,9 @@ public final class GameUtils {
             player.setPlayerPosition(newRow, newCol);
             TileUtils.highlightSinglePlayer(player.getPlayerPosition(), tileButtons);
             hasMovedThisTurn = true;
+
+            GameMove gameMove = createGameMove(player, tileButtons);
+            new Thread(new SaveGameMoveThread(gameMove)).start();
         } else {
             DialogUtils.showDialog("Out of Bounds", "You cannot move outside the board!", Alert.AlertType.WARNING);
         }
@@ -48,6 +54,13 @@ public final class GameUtils {
 
     private static boolean isValidPosition(int row, int column) {
         return row >= 0 && row < TileRepository.GRID_SIZE && column >= 0 && column < TileRepository.GRID_SIZE;
+    }
+
+    private static GameMove createGameMove(Player player, TileButton[][] tileButtons) {
+        PlayerState playerState = new PlayerState(player);
+        TileButton currentTileButton = tileButtons[player.getPlayerPosition().getRow()][player.getPlayerPosition().getColumn()];
+        TileState tileState = new TileState(currentTileButton.getTile());
+        return new GameMove(playerState, tileState);
     }
 
     public static void showWinnerDialog(Player player) {

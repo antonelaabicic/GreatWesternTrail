@@ -17,4 +17,9 @@ public enum WorkerType implements Tradeable {
         this.cost = cost;
         this.vp = vp;
     }
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }
