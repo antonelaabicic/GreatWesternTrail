@@ -46,6 +46,7 @@ public final class GameUtils {
             hasMovedThisTurn = true;
 
             GameMove gameMove = createGameMove(player, tileButtons);
+            XmlUtils.saveGameMove(gameMove);
             new Thread(new SaveGameMoveThread(gameMove)).start();
         } else {
             DialogUtils.showDialog("Out of Bounds", "You cannot move outside the board!", Alert.AlertType.WARNING);

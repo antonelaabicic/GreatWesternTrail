@@ -8,7 +8,7 @@ import hr.algebra.greatwesterntrail.model.GameState;
 import hr.algebra.greatwesterntrail.model.PlayerMode;
 import javafx.scene.control.Alert;
 
-public class NetworkingUtils {
+public final class NetworkingUtils {
     public static void sendGameState(GameState gameState) {
         if (GreatWesternTrailApplication.playerMode == PlayerMode.PLAYER_ONE) {
             GreatWesternTrailApplication.sendRequestFromPlayer(

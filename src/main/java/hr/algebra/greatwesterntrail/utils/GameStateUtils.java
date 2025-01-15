@@ -10,6 +10,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class GameStateUtils {
 
@@ -31,18 +34,18 @@ public final class GameStateUtils {
     }
 
     public static void loadGame() {
-        try {
-            GameState loadedState = SerializationUtils.read(SAVE_GAME_FILE_NAME);
-            applyLoadedGameState(loadedState);
+//        try {
+            //GameState loadedState = SerializationUtils.read(SAVE_GAME_FILE_NAME);
+            applyLoadedGameState();
 
             NetworkingUtils.showDialogAndSendGameStateUpdate(
                     "Loaded game",
                     GreatWesternTrailApplication.playerMode + " has loaded last saved game."
             );
-        } catch (IOException | ClassNotFoundException e) {
-            DialogUtils.showDialogAndDisable("Error", "Failed to load game state.", Alert.AlertType.ERROR);
-            e.printStackTrace();
-        }
+//        } catch (IOException | ClassNotFoundException e) {
+//            DialogUtils.showDialogAndDisable("Error", "Failed to load game state.", Alert.AlertType.ERROR);
+//            e.printStackTrace();
+//        }
     }
 
     public static void saveGameToFile(GameState gameState) {
@@ -62,7 +65,7 @@ public final class GameStateUtils {
         }
     }
 
-    public static void applyLoadedGameState(GameState loadedState) {
+    public static void applyLoadedGameState() {
         BoardController boardController = BoardController.getInstance();
         boardController.boardGrid.getChildren().clear();
 
@@ -110,6 +113,58 @@ public final class GameStateUtils {
         TileUtils.highlightTwoPlayers(player1, player2, boardController.tileButtons);
     }
 
+    public static void loadGameReplay() {
+        try {
+            GameState loadedState = SerializationUtils.read(SAVE_GAME_FILE_NAME);
+            applyLoadedGameStateReplay(loadedState);
+
+            NetworkingUtils.showDialogAndSendGameStateUpdate(
+                    "Loaded game",
+                    GreatWesternTrailApplication.playerMode + " has loaded last saved game."
+            );
+        } catch (IOException | ClassNotFoundException e) {
+            DialogUtils.showDialogAndDisable("Error", "Failed to load game state.", Alert.AlertType.ERROR);
+            e.printStackTrace();
+        }
+    }
+
+    public static void applyLoadedGameStateReplay(GameState gameState) {
+        BoardController.getInstance().boardGrid.getChildren().clear();
+
+        Tile[][] tiles = gameState.getTiles();
+        for (int row = 0; row < TileRepository.GRID_SIZE; row++) {
+            for (int col = 0; col < TileRepository.GRID_SIZE; col++) {
+                Tile tile = tiles[row][col];
+                tile.setIcons();
+
+                StackPane tileStack = null;
+                if (GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
+                    tileStack = TileUtils.createTileStack(
+                            tile, BoardController.getInstance().gameState.getPlayerOne(), BoardController.getInstance()
+                    );
+                    if (tile.getObjective() != null) {
+                        ImageUtils.addIconToStackPane(tile.getIcons(), "../images/scroll_icon.png", 20, 20, Pos.TOP_LEFT);
+                        TileRepository.INSTANCE.addObjectiveTooltip(tile, tile.getObjective());
+                    }
+
+                    TileButton tileButton = (TileButton) tileStack.getChildren().get(0);
+                    BoardController.getInstance().tileButtons[row][col] = tileButton;
+                }
+                BoardController.getInstance().boardGrid.add(tileStack, col, row);
+            }
+        }
+
+        Player player1 = BoardController.getInstance().gameState.getPlayerOne();
+
+        if (player1 != null) {
+            TrainProgressUtils.updateTrainProgressBar(BoardController.getInstance().pbTrain1, player1.getTrainProgress());
+            BoardController.getInstance().pbTrain1.setBarColor(Color.RED);
+            BoardController.getInstance().pbTrain1.setVisible(true);
+        }
+
+        TileUtils.highlightSinglePlayer(player1.getPlayerPosition(), BoardController.getInstance().tileButtons);
+    }
+
     public static void initializeSinglePlayerGameState() {
         BoardController.getInstance().tileRepository = TileRepository.INSTANCE;
         Tile[][] tiles = BoardController.getInstance().tileRepository.getTiles();
@@ -121,11 +176,12 @@ public final class GameStateUtils {
                 null,
                 false
         );
+        saveGameToFile(BoardController.getInstance().gameState);
         initializeBoard(BoardController.getInstance().gameState.getTiles());
         GameUtils.setupProgressBars();
     }
 
-    private static void initializeBoard(Tile[][] tiles) {
+    public static void initializeBoard(Tile[][] tiles) {
         BoardController.getInstance().boardGrid.getChildren().clear();
         for (int row = 0; row < TileRepository.GRID_SIZE; row++) {
             for (int col = 0; col < TileRepository.GRID_SIZE; col++) {
@@ -145,7 +201,7 @@ public final class GameStateUtils {
         GameState loadedState = GameStateUtils.loadGameFromFile();
         if (loadedState != null || GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
             BoardController.getInstance().gameState = loadedState;
-            applyLoadedGameState(loadedState);
+            applyLoadedGameState();
         } else {
             BoardController.getInstance().tileRepository = TileRepository.INSTANCE;
             Tile[][] tiles = BoardController.getInstance().tileRepository.getTiles();
@@ -158,7 +214,7 @@ public final class GameStateUtils {
                     false
             );
             saveGameToFile(BoardController.getInstance().gameState);
-            applyLoadedGameState(BoardController.getInstance().gameState);
+            applyLoadedGameState();
             GameUtils.setupProgressBars();
         }
     }
@@ -180,7 +236,7 @@ public final class GameStateUtils {
                 false
         );
         saveGameToFile(BoardController.getInstance().gameState);
-        applyLoadedGameState(BoardController.getInstance().gameState);
+        applyLoadedGameState();
         BoardController.getInstance().taChatMessages.clear();
         NetworkingUtils.showDialogAndSendGameStateUpdate(
                 "New game",

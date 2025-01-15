@@ -28,6 +28,7 @@
               <MenuItem mnemonicParsing="false" onAction="#startNewGame" text="New" />
               <MenuItem mnemonicParsing="false" onAction="#saveGame" text="Save" />
               <MenuItem mnemonicParsing="false" onAction="#loadGame" text="Load" />
+              <MenuItem mnemonicParsing="false" onAction="#replayGame" text="Replay" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Documentation">
@@ -101,7 +102,7 @@
                          <Insets left="10.0" />
                      </HBox.margin>
                  </Button>
-               <TextArea fx:id="taChatMessages" prefWidth="323.0" promptText="Message:" wrapText="true">
+               <TextArea fx:id="taChatMessages" editable="false" prefWidth="323.0" promptText="Message:" wrapText="true">
                    <HBox.margin>
                        <Insets left="15.0" right="15.0" top="15.0" bottom="15.0"/>
                    </HBox.margin>

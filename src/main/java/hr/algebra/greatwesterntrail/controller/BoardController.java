@@ -6,6 +6,8 @@ import hr.algebra.greatwesterntrail.repository.TileRepository;
 import hr.algebra.greatwesterntrail.rmi.ChatRemoteService;
 import hr.algebra.greatwesterntrail.rmi.ChatServer;
 import hr.algebra.greatwesterntrail.utils.*;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,7 +17,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +25,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BoardController {
     @FXML
@@ -119,6 +123,7 @@ public class BoardController {
         } else {
             GameStateUtils.startNewGameSinglePlayer();
         }
+        boardGrid.requestFocus();
     }
 
     public void saveGame(ActionEvent actionEvent) { GameStateUtils.saveGame(gameState); }
@@ -137,5 +142,25 @@ public class BoardController {
         ChatUtils.sendChatMessage(tfChatMessages, taChatMessages, chatRemoteService);
         tfChatMessages.clear();
         boardGrid.requestFocus();
+    }
+
+    public void replayGame(ActionEvent actionEvent) {
+        if (GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
+            GameStateUtils.loadGameReplay();
+        }
+
+        List<GameMove> gameMoves = XmlUtils.parse(XmlUtils.XML_FILE_NAME);
+        final AtomicInteger counter = new AtomicInteger(0);
+
+        Timeline replay = new Timeline(new KeyFrame(Duration.ZERO, e -> {
+            GameMove gameMove = gameMoves.get(counter.get());
+            PlayerState playerState = gameMove.getPlayerState();
+            Position playerPosition = playerState.getPosition();
+
+            TileUtils.highlightSinglePlayer(playerPosition, tileButtons);
+            counter.set(counter.get() + 1);
+        }), new KeyFrame(Duration.seconds(2)));
+        replay.setCycleCount(gameMoves.size());
+        replay.play();
     }
 }

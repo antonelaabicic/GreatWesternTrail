@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!ELEMENT GameMoves (GameMove+)>
+<!ELEMENT GameMove (PlayerState, TileState, Time)>
+
+<!ELEMENT PlayerState (Points, Money, TrainProgress, CowDeck, WorkerDeck)>
+<!ELEMENT Points (#PCDATA)>
+<!ELEMENT Money (#PCDATA)>
+<!ELEMENT TrainProgress (#PCDATA)>
+<!ELEMENT CowDeck (CowType+)>
+<!ELEMENT CowType (CowQuantity)>
+<!ATTLIST CowType name CDATA #REQUIRED>
+<!ELEMENT CowQuantity (#PCDATA)>
+<!ELEMENT WorkerDeck (WorkerType+)>
+<!ELEMENT WorkerType (WorkerQuantity)>
+<!ATTLIST WorkerType name CDATA #REQUIRED>
+<!ELEMENT WorkerQuantity (#PCDATA)>
+
+<!ELEMENT TileState (Position, TileType, BuildingType?, HazardType?, Objective?)>
+<!ELEMENT Position (Row, Column)>
+<!ELEMENT Row (#PCDATA)>
+<!ELEMENT Column (#PCDATA)>
+<!ELEMENT TileType (#PCDATA)>
+<!ELEMENT BuildingType (#PCDATA)>
+<!ELEMENT HazardType (#PCDATA)>
+<!ELEMENT Objective (ObjectiveStatus, ObjectiveAction, ObjectiveQuantity)>
+<!ELEMENT ObjectiveStatus (#PCDATA)>
+<!ELEMENT ObjectiveAction (#PCDATA)>
+<!ELEMENT ObjectiveQuantity (#PCDATA)>
+
+<!ELEMENT Time (#PCDATA)>

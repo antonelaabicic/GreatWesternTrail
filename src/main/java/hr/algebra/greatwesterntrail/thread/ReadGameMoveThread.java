@@ -80,6 +80,10 @@ public class ReadGameMoveThread extends GameMoveThread implements Runnable {
                 break;
         }
 
+        if (tileState.getObjective() != null) {
+            tileDetails.append(" => ").append(tileState.getObjective().getDescription());
+        }
+
         return tileDetails.toString();
     }
 

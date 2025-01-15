@@ -12,7 +12,7 @@ import javafx.util.Duration;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public class ChatUtils {
+public final class ChatUtils {
 
     public static void createAndRunChatTimeline(ChatRemoteService chatRemoteService,
                                                 TextArea chatMessagesTextArea)

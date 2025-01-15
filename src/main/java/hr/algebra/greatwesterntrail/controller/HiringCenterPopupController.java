@@ -137,7 +137,6 @@ public class HiringCenterPopupController {
 
     private void updateWorkerDeck(Map<WorkerType, Integer> hireQuantities, Map<WorkerType, Integer> fireQuantities) {
         PopupUtils.updateDeck(player.getWorkerDeck(), hireQuantities, fireQuantities);
-        //
         hireQuantities.forEach((workerType, count) -> {
             int newCount = player.getWorkerDeck().getOrDefault(workerType, 0);
             player.updatePeakValues(workerType, newCount);

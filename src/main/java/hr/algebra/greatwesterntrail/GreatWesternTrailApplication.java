@@ -25,8 +25,6 @@ import java.net.Socket;
 public class GreatWesternTrailApplication extends Application {
 
     public static final String HOST = "localhost";
-//    public static final int PLAYER_TWO_SERVER_PORT = 1989;
-//    public static final int PLAYER_ONE_SERVER_PORT = 1990;
 
     public static PlayerMode playerMode;
 
@@ -94,7 +92,7 @@ public class GreatWesternTrailApplication extends Application {
 
             Platform.runLater(() -> {
                 BoardController.getInstance().gameState = receivedState;
-                GameStateUtils.applyLoadedGameState(receivedState);
+                GameStateUtils.applyLoadedGameState();
                 BoardController.getInstance().gameState.nextTurn();
                 UIUtils.enableGameScreen(BoardController.getInstance());
                 if (receivedState.getDialogMessage() != null && !receivedState.getDialogMessage().isEmpty()) {

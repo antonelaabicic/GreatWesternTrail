@@ -21,6 +21,13 @@ public class Tile implements Serializable {
     private Objective objective;
     private transient StackPane icons;
 
+    //
+    public Tile() {
+        this.tileType = TileType.EMPTY;
+        this.icons = new StackPane();
+        setupIcons();
+    }
+
     public Tile(BuildingType buildingType, Objective objective) {
         this.tileType = TileType.BUILDING;
         this.buildingType = buildingType;

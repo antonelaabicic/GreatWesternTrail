@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Optional;
 
 @Data
 public class TileState implements Serializable {
