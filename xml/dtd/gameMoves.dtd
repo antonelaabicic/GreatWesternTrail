@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!ELEMENT GameMoves (GameMove+)>
-<!ELEMENT GameMove (PlayerState, TileState, Time)>
+<!ELEMENT GameMove (PlayerState, TileState, Board, Time)>
 
 <!ELEMENT PlayerState (Points, Money, TrainProgress, CowDeck, WorkerDeck)>
 <!ELEMENT Points (#PCDATA)>
@@ -26,5 +26,8 @@
 <!ELEMENT ObjectiveStatus (#PCDATA)>
 <!ELEMENT ObjectiveAction (#PCDATA)>
 <!ELEMENT ObjectiveQuantity (#PCDATA)>
+
+<!ELEMENT Board (Tile+)>
+<!ELEMENT Tile (Position, TileType, BuildingType?, HazardType?, Objective?)>
 
 <!ELEMENT Time (#PCDATA)>

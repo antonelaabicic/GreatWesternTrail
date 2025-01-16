@@ -28,7 +28,7 @@
               <MenuItem mnemonicParsing="false" onAction="#startNewGame" text="New" />
               <MenuItem mnemonicParsing="false" onAction="#saveGame" text="Save" />
               <MenuItem mnemonicParsing="false" onAction="#loadGame" text="Load" />
-              <MenuItem mnemonicParsing="false" onAction="#replayGame" text="Replay" />
+              <MenuItem fx:id="miReplay" mnemonicParsing="false" onAction="#replayGame" text="Replay" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Documentation">

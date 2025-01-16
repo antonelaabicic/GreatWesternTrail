@@ -16,14 +16,11 @@ public abstract class GameMoveThread {
     public synchronized void saveTheLastGameMove(GameMove gameMove) {
         while(FILE_ACCESS_IN_PROGRESS) {
             try {
-                System.out.println("Waiting before saving...");
                 wait();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-
-        System.out.println("File access in progress = true before saving...");
 
         List<GameMove> finalGameMoveList = new ArrayList<>();
         if (Files.exists(Path.of(GameMoveUtils.FILE_PATH))) {
@@ -44,8 +41,6 @@ public abstract class GameMoveThread {
         }
 
         FILE_ACCESS_IN_PROGRESS = false;
-        System.out.println("File access in progress = false after saving...");
-
         notifyAll();
     }
 
@@ -53,7 +48,6 @@ public abstract class GameMoveThread {
 
         while(FILE_ACCESS_IN_PROGRESS) {
             try {
-                System.out.println("Waiting before loading...");
                 wait();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -61,15 +55,11 @@ public abstract class GameMoveThread {
         }
 
         FILE_ACCESS_IN_PROGRESS = true;
-        System.out.println("File access in progress = true before loading...");
 
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(GameMoveUtils.FILE_PATH));
-
         List<GameMove> gameMoveList = new ArrayList<>((List<GameMove>) ois.readObject());
 
         FILE_ACCESS_IN_PROGRESS = false;
-        System.out.println("File access in progress = false after loading...");
-
         notifyAll();
 
         return gameMoveList;

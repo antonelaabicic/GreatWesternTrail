@@ -14,11 +14,13 @@ public class GameMove implements Serializable {
 
     private PlayerState playerState;
     private TileState tileState;
+    private Tile[][] tiles;
     private LocalDateTime time;
 
-    public GameMove(PlayerState playerState, TileState tileState) {
+    public GameMove(PlayerState playerState, TileState tileState, Tile[][] tiles) {
         this.playerState = playerState;
         this.tileState = tileState;
+        this.tiles = tiles;
         this.time = LocalDateTime.now();
     }
 }

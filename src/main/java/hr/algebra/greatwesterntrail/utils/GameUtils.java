@@ -10,6 +10,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class GameUtils {
 
@@ -18,8 +21,6 @@ public final class GameUtils {
     private GameUtils() { }
 
     public static void handleKeyboardNavigation(KeyEvent event, Player player, TileButton[][] tileButtons) {
-        BoardController.getInstance().boardGrid.requestFocus();
-
         int currentRow = player.getPlayerPosition().getRow();
         int currentCol = player.getPlayerPosition().getColumn();
         int newRow = currentRow;
@@ -46,7 +47,9 @@ public final class GameUtils {
             hasMovedThisTurn = true;
 
             GameMove gameMove = createGameMove(player, tileButtons);
-            XmlUtils.saveGameMove(gameMove);
+            if (GreatWesternTrailApplication.playerMode == PlayerMode.SINGLE_PLAYER) {
+                XmlUtils.saveGameMove(gameMove);
+            }
             new Thread(new SaveGameMoveThread(gameMove)).start();
         } else {
             DialogUtils.showDialog("Out of Bounds", "You cannot move outside the board!", Alert.AlertType.WARNING);
@@ -61,7 +64,7 @@ public final class GameUtils {
         PlayerState playerState = new PlayerState(player);
         TileButton currentTileButton = tileButtons[player.getPlayerPosition().getRow()][player.getPlayerPosition().getColumn()];
         TileState tileState = new TileState(currentTileButton.getTile());
-        return new GameMove(playerState, tileState);
+        return new GameMove(playerState, tileState, BoardController.getInstance().gameState.getTiles());
     }
 
     public static void showWinnerDialog(Player player) {
@@ -176,6 +179,23 @@ public final class GameUtils {
         } else {
             BoardController.getInstance().taLastMove.setVisible(false);
             BoardController.getInstance().taLastMove.setManaged(false);
+        }
+    }
+
+    public static void toggleVisibilityReplayMenuItem() {
+        if (GreatWesternTrailApplication.playerMode != PlayerMode.SINGLE_PLAYER) {
+            BoardController.getInstance().miReplay.setVisible(false);
+        }
+        BoardController.getInstance().taLastMove.setFocusTraversable(false);
+        BoardController.getInstance().tfChatMessages.setFocusTraversable(false);
+    }
+
+    public static void deleteFile(String filename) {
+        Path path = Paths.get(filename);
+        try {
+            if (Files.exists(path)) { Files.delete(path); }
+        } catch (IOException e) {
+            System.out.println("Failed to delete the file: " + e.getMessage());
         }
     }
 }

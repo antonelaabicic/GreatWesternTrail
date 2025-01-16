@@ -26,6 +26,9 @@ public enum GameMoveTag {
     OBJECTIVE_ACTION("ObjectiveAction"),
     OBJECTIVE_QUANTITY("ObjectiveQuantity"),
 
+    BOARD("Board"),
+    TILE("Tile"),
+
     TIME("Time");
 
     private String tag;
